@@ -13,18 +13,27 @@ using zongPanel.Library;
 
 namespace zongPanel {
 
-	public enum EfficacyDock {
+	/// <summary>效能監視面板停靠點</summary>
+	public enum UsageDock {
+		/// <summary>不顯示效能監視面板，隱藏</summary>
 		HIDDEN,
+		/// <summary>停靠於主面板上方</summary>
 		UP,
+		/// <summary>停靠於主面板下方</summary>
 		DOWN
 	}
 
+	/// <summary>主面板之功能</summary>
 	public enum Shortcut {
+		/// <summary>便利貼</summary>
 		NOTE = 1,
+		/// <summary>網路收音機</summary>
 		RADIO = 2,
+		/// <summary>小算盤捷徑</summary>
 		CALCULATOR = 4
 	}
 
+	/// <summary>面板設定資訊</summary>
 	[Serializable]
 	public class PanelConfig : ISerializable {
 
@@ -46,8 +55,11 @@ namespace zongPanel {
 		private Font mNoteCntFont;
 		private Font mEffcFont;
 		private SizeF mNoteSize;
-		private EfficacyDock mEffcDock;
+		private UsageDock mEffcDock;
 		private Shortcut mShortcut;
+		private string mDateFmt;
+		private Dictionary<DayOfWeek, string> mWeekFmt;
+		private bool mShowSec;
 
 		public PanelConfig() {
 			var workRect = Screen.PrimaryScreen.WorkingArea;
@@ -71,8 +83,15 @@ namespace zongPanel {
 			mNoteCntFont = new Font("微軟正黑體", 12);
 			mEffcFont = new Font("Agency FB", 12, FontStyle.Bold);
 			mNoteSize = new SizeF(300, 250);
-			mEffcDock = EfficacyDock.UP;
+			mEffcDock = UsageDock.UP;
 			mShortcut = Shortcut.CALCULATOR | Shortcut.NOTE | Shortcut.RADIO;
+			mShowSec = false;
+			mDateFmt = @"dd/MMM/yyyy";
+			mWeekFmt = new Dictionary<DayOfWeek, string> {
+				{ DayOfWeek.Friday, "Fri" }, { DayOfWeek.Monday, "Mon" }, { DayOfWeek.Saturday, "Sat" },
+				{ DayOfWeek.Sunday, "Sun" }, { DayOfWeek.Thursday, "Thr" }, { DayOfWeek.Tuesday, "Tue" },
+				{ DayOfWeek.Wednesday, "Wed" }
+			};
 		}
 
 		public PanelConfig(SerializationInfo info, StreamingContext context) {
@@ -94,8 +113,11 @@ namespace zongPanel {
 			mNoteCntFont = (Font)info.GetValue("NoteContentFont", typeof(Font));
 			mEffcFont = (Font)info.GetValue("UsageFont", typeof(Font));
 			mNoteSize = (SizeF)info.GetValue("NoteSize", typeof(SizeF));
-			mEffcDock = (EfficacyDock)info.GetValue("UsageDock", typeof(EfficacyDock));
+			mEffcDock = (UsageDock)info.GetValue("UsageDock", typeof(UsageDock));
 			mShortcut = (Shortcut)info.GetValue("Shortcut", typeof(Shortcut));
+			mShowSec = info.GetBoolean("ShowSecond");
+			mDateFmt = info.GetString("DateFormat");
+			mWeekFmt = info.GetValue("WeekFormat", typeof(Dictionary<DayOfWeek, string>)) as Dictionary<DayOfWeek, string>;
 		}
 
 		public void GetObjectData(SerializationInfo info, StreamingContext context) {
@@ -119,14 +141,19 @@ namespace zongPanel {
 			info.AddValue("NoteSize", mNoteSize);
 			info.AddValue("UsageDock", mEffcDock);
 			info.AddValue("Shortcut", mShortcut);
+			info.AddValue("ShowSecond", mShowSec);
+			info.AddValue("DateFormat", mDateFmt);
+			info.AddValue("WeekFormat", mWeekFmt);
 		}
 
+		/// <summary>取得此設定檔之複製品，深層複製</summary>
 		public PanelConfig Clone() {
 			PanelConfig copied = null;
 			using (MemoryStream ms = new MemoryStream()) {
+				/* 將目前的資訊序列化儲存至 MemoryStream 裡 */
 				SoapFormatter sf = new SoapFormatter();
 				sf.Serialize(ms, this);
-
+				/* 從 MemoryStream 做反序列化，此即複製品 */
 				ms.Position = 0;
 				copied = sf.Deserialize(ms) as PanelConfig;
 			}

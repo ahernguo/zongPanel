@@ -66,10 +66,16 @@ namespace zongPanel.Library {
 		#endregion
 
 		#region Windows <-> Forms
+		/// <summary>將 Windows.Media.Color 轉換為 Drawing.Color</summary>
+		/// <param name="wpfColor">欲轉換的 <see cref="Color"/></param>
+		/// <returns><see cref="System.Drawing.Color"/></returns>
 		public static System.Drawing.Color ToColor(this Color wpfColor) {
 			return System.Drawing.Color.FromArgb(wpfColor.A, wpfColor.R, wpfColor.G, wpfColor.B);
 		}
 
+		/// <summary>將 Windows.Media.Brush 轉換為 Drawing.Brush</summary>
+		/// <param name="wpfBrush">欲轉換的 <see cref="Brush"/></param>
+		/// <returns><see cref="System.Drawing.Brush"/></returns>
 		public static System.Drawing.Brush ToBrush(this Brush wpfBrush) {
 			System.Drawing.Brush convertBrush = null;
 			SolidColorBrush wpfSolid = wpfBrush as SolidColorBrush;
@@ -79,6 +85,9 @@ namespace zongPanel.Library {
 			return convertBrush;
 		}
 
+		/// <summary>取得 Windows.Media.Brush 之對應的 Drawing.Color</summary>
+		/// <param name="wpfBrush">欲轉換的 <see cref="Brush"/></param>
+		/// <returns><see cref="System.Drawing.Color"/></returns>
 		public static System.Drawing.Color GetColor(this Brush wpfBrush) {
 			System.Drawing.Color convertColor = System.Drawing.Color.Empty;
 			SolidColorBrush wpfSolid = wpfBrush as SolidColorBrush;
@@ -88,6 +97,9 @@ namespace zongPanel.Library {
 			return convertColor;
 		}
 
+		/// <summary>取得 Windows.Controls.Control 之對應的 Drawing.Font</summary>
+		/// <param name="ctrl">欲轉換的 <see cref="Control"/></param>
+		/// <returns><see cref="System.Drawing.Font"/></returns>
 		public static System.Drawing.Font GetFont(this Control ctrl) {
 			string fontFamily = ctrl.FontFamily.Source;
 			float emSize = (float)ctrl.FontSize;
