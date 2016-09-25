@@ -4,7 +4,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Soap;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,41 +23,78 @@ namespace zongPanel {
 	}
 
 	/// <summary>主面板之功能</summary>
+	[DataContract]
+	[Flags]
 	public enum Shortcut {
 		/// <summary>便利貼</summary>
+		[EnumMember]
 		NOTE = 1,
 		/// <summary>網路收音機</summary>
+		[EnumMember]
 		RADIO = 2,
 		/// <summary>小算盤捷徑</summary>
+		[EnumMember]
 		CALCULATOR = 4
 	}
 
 	/// <summary>面板設定資訊</summary>
-	[Serializable]
-	public class PanelConfig : ISerializable {
+	[DataContract(Name = "Configurations")]
+	[KnownType(typeof(Color))]
+	[KnownType(typeof(DayOfWeek))]
+	[KnownType(typeof(Font))]
+	[KnownType(typeof(FontStyle))]
+	[KnownType(typeof(GraphicsUnit))]
+	[KnownType(typeof(PointF))]
+	[KnownType(typeof(RectangleF))]
+	[KnownType(typeof(Shortcut))]
+	[KnownType(typeof(SizeF))]
+	public class PanelConfig  {
 
+		[DataMember(Name = "WindowRectangle")]
 		private RectangleF mWindRect;
+		[DataMember(Name = "DatePosition")]
 		private PointF mDatePos;
+		[DataMember(Name = "WeekPosition")]
 		private PointF mWeekPos;
+		[DataMember(Name = "TimePosition")]
 		private PointF mTimePos;
+		[DataMember(Name = "WindowBackground")]
 		private Color mWindBg;
+		[DataMember(Name = "NoteBackground")]
 		private Color mNoteBg;
+		[DataMember(Name = "DateForeground")]
 		private Color mDateFg;
+		[DataMember(Name = "WeekForeground")]
 		private Color mWeekFg;
+		[DataMember(Name = "TimeForeground")]
 		private Color mTimeFg;
+		[DataMember(Name = "NoteTitleForeground")]
 		private Color mNoteTitFg;
+		[DataMember(Name = "NoteContentForeground")]
 		private Color mNoteCntFg;
+		[DataMember(Name = "DateFont")]
 		private Font mDateFont;
+		[DataMember(Name = "WeekFont")]
 		private Font mWeekFont;
+		[DataMember(Name = "TimeFont")]
 		private Font mTimeFont;
+		[DataMember(Name = "NoteTitleFont")]
 		private Font mNoteTitFont;
+		[DataMember(Name = "NoteContentFont")]
 		private Font mNoteCntFont;
+		[DataMember(Name = "UsageFont")]
 		private Font mEffcFont;
+		[DataMember(Name = "NoteSize")]
 		private SizeF mNoteSize;
+		[DataMember(Name = "UsageDock")]
 		private UsageDock mEffcDock;
+		[DataMember(Name = "Shortcut")]
 		private Shortcut mShortcut;
+		[DataMember(Name = "DateFormat")]
 		private string mDateFmt;
+		[DataMember(Name = "WeekFormat")]
 		private Dictionary<DayOfWeek, string> mWeekFmt;
+		[DataMember(Name = "ShowSecond")]
 		private bool mShowSec;
 
 		public PanelConfig() {
@@ -88,62 +124,11 @@ namespace zongPanel {
 			mShowSec = false;
 			mDateFmt = @"dd/MMM/yyyy";
 			mWeekFmt = new Dictionary<DayOfWeek, string> {
-				{ DayOfWeek.Friday, "Fri" }, { DayOfWeek.Monday, "Mon" }, { DayOfWeek.Saturday, "Sat" },
-				{ DayOfWeek.Sunday, "Sun" }, { DayOfWeek.Thursday, "Thr" }, { DayOfWeek.Tuesday, "Tue" },
-				{ DayOfWeek.Wednesday, "Wed" }
+				{ DayOfWeek.Sunday, "Sun" }, { DayOfWeek.Monday, "Mon" },
+				{ DayOfWeek.Tuesday, "Tue" }, { DayOfWeek.Wednesday, "Wed" },
+				{ DayOfWeek.Thursday, "Thu" }, { DayOfWeek.Friday, "Fri" },
+				{ DayOfWeek.Saturday, "Sat" }
 			};
-		}
-
-		public PanelConfig(SerializationInfo info, StreamingContext context) {
-			mWindRect = (RectangleF)info.GetValue("PanelRectangle", typeof(RectangleF));
-			mDatePos = (PointF)info.GetValue("DatePosition", typeof(PointF));
-			mWeekPos = (PointF)info.GetValue("WeekPosition", typeof(PointF));
-			mTimePos = (PointF)info.GetValue("TimePosition", typeof(PointF));
-			mWindBg = (Color)info.GetValue("PanelBackground", typeof(Color));
-			mNoteBg = (Color)info.GetValue("NoteBackground", typeof(Color));
-			mDateFg = (Color)info.GetValue("DateForeground", typeof(Color));
-			mWeekFg = (Color)info.GetValue("WeekForeground", typeof(Color));
-			mTimeFg = (Color)info.GetValue("TimeForeground", typeof(Color));
-			mNoteTitFg = (Color)info.GetValue("NoteTitleForeground", typeof(Color));
-			mNoteCntFg = (Color)info.GetValue("NoteContentForeground", typeof(Color));
-			mDateFont = (Font)info.GetValue("DateFont", typeof(Font));
-			mWeekFont = (Font)info.GetValue("WeekFont", typeof(Font));
-			mTimeFont = (Font)info.GetValue("TimeFont", typeof(Font));
-			mNoteTitFont = (Font)info.GetValue("NoteTitleFont", typeof(Font));
-			mNoteCntFont = (Font)info.GetValue("NoteContentFont", typeof(Font));
-			mEffcFont = (Font)info.GetValue("UsageFont", typeof(Font));
-			mNoteSize = (SizeF)info.GetValue("NoteSize", typeof(SizeF));
-			mEffcDock = (UsageDock)info.GetValue("UsageDock", typeof(UsageDock));
-			mShortcut = (Shortcut)info.GetValue("Shortcut", typeof(Shortcut));
-			mShowSec = info.GetBoolean("ShowSecond");
-			mDateFmt = info.GetString("DateFormat");
-			mWeekFmt = info.GetValue("WeekFormat", typeof(Dictionary<DayOfWeek, string>)) as Dictionary<DayOfWeek, string>;
-		}
-
-		public void GetObjectData(SerializationInfo info, StreamingContext context) {
-			info.AddValue("PanelRectangle", mWindRect);
-			info.AddValue("DatePosition", mDatePos);
-			info.AddValue("WeekPosition", mWeekPos);
-			info.AddValue("TimePosition", mTimePos);
-			info.AddValue("PanelBackground", mWindBg);
-			info.AddValue("NoteBackground", mNoteBg);
-			info.AddValue("DateForeground", mDateFg);
-			info.AddValue("WeekForeground", mWeekFg);
-			info.AddValue("TimeForeground", mTimeFg);
-			info.AddValue("NoteTitleForeground", mNoteTitFg);
-			info.AddValue("NoteContentForeground", mNoteCntFg);
-			info.AddValue("DateFont", mDateFont);
-			info.AddValue("WeekFont", mWeekFont);
-			info.AddValue("TimeFont", mTimeFont);
-			info.AddValue("NoteTitleFont", mNoteTitFont);
-			info.AddValue("NoteContentFont", mNoteCntFont);
-			info.AddValue("UsageFont", mEffcFont);
-			info.AddValue("NoteSize", mNoteSize);
-			info.AddValue("UsageDock", mEffcDock);
-			info.AddValue("Shortcut", mShortcut);
-			info.AddValue("ShowSecond", mShowSec);
-			info.AddValue("DateFormat", mDateFmt);
-			info.AddValue("WeekFormat", mWeekFmt);
 		}
 
 		/// <summary>取得此設定檔之複製品，深層複製</summary>
@@ -151,11 +136,11 @@ namespace zongPanel {
 			PanelConfig copied = null;
 			using (MemoryStream ms = new MemoryStream()) {
 				/* 將目前的資訊序列化儲存至 MemoryStream 裡 */
-				SoapFormatter sf = new SoapFormatter();
-				sf.Serialize(ms, this);
+				DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
+				contSer.WriteObject(ms, this);
 				/* 從 MemoryStream 做反序列化，此即複製品 */
 				ms.Position = 0;
-				copied = sf.Deserialize(ms) as PanelConfig;
+				copied = contSer.ReadObject(ms) as PanelConfig;
 			}
 			return copied;
 		}

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Soap;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -103,10 +103,11 @@ namespace zongPanel {
 		/// <summary>載入設定檔，如未建立設定檔則新建之</summary>
 		private void InitializeConfiguration() {
 			if (File.Exists(mPath["Config"])) {
-				using (FileStream fs = new FileStream(mPath["Config"], FileMode.Open)) {
-					SoapFormatter sf = new SoapFormatter();
-					mConfig = sf.Deserialize(fs) as PanelConfig;
+				using (XmlReader xr = XmlReader.Create(mPath["Config"])) {
+					DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
+					mConfig = contSer.ReadObject(xr) as PanelConfig;
 				}
+
 			} else {
 				mConfig = new PanelConfig();
 				SaveConfig();
@@ -115,17 +116,10 @@ namespace zongPanel {
 
 		/// <summary>以 SOAP 序列化的方式儲存 <see cref="PanelConfig"/></summary>
 		private void SaveConfig() {
-			using (MemoryStream ms = new MemoryStream()) {
-				SoapFormatter sf = new SoapFormatter();
-				sf.Serialize(ms, mConfig);
-
-				ms.Position = 0;
-				XDocument doc = XDocument.Load(ms);
-
-				XmlWriterSettings setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
-				using (XmlWriter xw = XmlWriter.Create(mPath["Config"], setting)) {
-					doc.Save(xw);
-				}
+			XmlWriterSettings setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
+			using (XmlWriter xw = XmlWriter.Create(mPath["Config"], setting)) {
+				DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
+				contSer.WriteObject(xw, mConfig);
 			}
 		}
 		#endregion

@@ -41,7 +41,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization.Formatters.Soap" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -76,8 +76,15 @@
       <DependentUpon>Main.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Forms\Option.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Forms\Option.xaml.cs">
+      <DependentUpon>Option.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Libraries\DailyXmlListener.cs" />
     <Compile Include="Libraries\Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

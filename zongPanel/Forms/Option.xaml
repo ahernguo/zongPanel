@@ -1,0 +1,127 @@
+﻿<Window x:Class="zongPanel.Forms.Option"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:zongPanel.Forms"
+        mc:Ignorable="d"
+        Title="Option" Height="500" Width="422" AllowsTransparency="True" WindowStyle="None">
+    <Grid x:Name="gridMain" Background="#E5202020">
+        <Label x:Name="lbTitle" Content="設定" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="Gainsboro" FontSize="20"/>
+        <Separator x:Name="lineTitle" HorizontalAlignment="Left" Height="6" Margin="65,25,0,0" VerticalAlignment="Top" Width="272"/>
+        <Image x:Name="imgExit" HorizontalAlignment="Left" Height="30" Margin="380,13,0,0" VerticalAlignment="Top" Width="30" Source="pack://siteoforigin:,,,/Resources/close_org.png"/>
+        <Image x:Name="imgSave" HorizontalAlignment="Left" Height="30" Margin="345,13,0,0" VerticalAlignment="Top" Width="30" Source="pack://siteoforigin:,,,/Resources/save_org.png"/>
+        <TabControl x:Name="tabControl" Margin="0,50,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+            <TabItem x:Name="tabPanel" Header="面板" FontSize="14">
+                <Grid x:Name="gridPanel" Background="#FFE5E5E5" Margin="0,1,0,-1">
+                    <GroupBox x:Name="gbPanel" Header="主面板" HorizontalAlignment="Left" Height="120" Margin="10,10,0,0" VerticalAlignment="Top" Width="195" BorderBrush="#FFC8C8C8">
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="0,0,0,0">
+                            <Button x:Name="btnUnlock" Content="解鎖面板" HorizontalAlignment="Left" Height="32" Margin="15,10,0,0" VerticalAlignment="Top" Width="81"/>
+                            <Label x:Name="lbTrans" Content="透明度" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top"/>
+                            <Label x:Name="lbTransP" Content="%" HorizontalAlignment="Left" Margin="145,56,0,0" VerticalAlignment="Top"/>
+                            <ComboBox x:Name="cbTrans" HorizontalAlignment="Left" Margin="65,58,0,0" VerticalAlignment="Top" Width="77" SelectedIndex="8">
+                                <ComboBoxItem Content="10"/>
+                                <ComboBoxItem Content="20"/>
+                                <ComboBoxItem Content="30"/>
+                                <ComboBoxItem Content="40"/>
+                                <ComboBoxItem Content="50"/>
+                                <ComboBoxItem Content="60"/>
+                                <ComboBoxItem Content="70"/>
+                                <ComboBoxItem Content="80"/>
+                                <ComboBoxItem Content="90"/>
+                                <ComboBoxItem Content="100"/>
+                            </ComboBox>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox x:Name="gbShortcut" Header="捷徑" HorizontalAlignment="Left" Margin="208,10,0,0" VerticalAlignment="Top" Height="120" Width="195" BorderBrush="#FFC8C8C8">
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
+                            <CheckBox x:Name="chkNote" Content="便利貼" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                            <CheckBox x:Name="chkRadio" Content="網路收音機" HorizontalAlignment="Left" Margin="15,40,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                            <CheckBox x:Name="chkCalc" Content="小算盤" HorizontalAlignment="Left" Margin="15,70,0,0" VerticalAlignment="Top" IsChecked="True"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox x:Name="gbStyle" Header="樣式" HorizontalAlignment="Left" Margin="208,135,0,0" VerticalAlignment="Top" Height="182" Width="195" BorderBrush="#FFC8C8C8">
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
+                            <Label x:Name="lbDateFont" Content="日期" HorizontalAlignment="Left" Margin="10,21,0,0" VerticalAlignment="Top"/>
+                            <Label x:Name="lbWeekFont" Content="星期" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top"/>
+                            <Label x:Name="lbTimeFont" Content="時間" HorizontalAlignment="Left" Margin="10,111,0,0" VerticalAlignment="Top"/>
+                            <Button x:Name="btnDateFont" Content="A" HorizontalAlignment="Left" Margin="50,20,0,0" VerticalAlignment="Top" Width="30" Height="30"/>
+                            <Button x:Name="btnWeekFont" Content="A" HorizontalAlignment="Left" Margin="50,65,0,0" VerticalAlignment="Top" Width="30" Height="30"/>
+                            <Button x:Name="btnTimeFont" Content="A" HorizontalAlignment="Left" Margin="50,110,0,0" VerticalAlignment="Top" Width="30" Height="30"/>
+                            <Rectangle x:Name="rectDateColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,20,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30"/>
+                            <Rectangle x:Name="rectWeekColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,65,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30"/>
+                            <Rectangle x:Name="rectTimeColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,110,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30"/>
+                            <ComboBox x:Name="cbWeekAlpha" HorizontalAlignment="Left" Margin="127,23,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8">
+                                <ComboBoxItem Content="10"/>
+                                <ComboBoxItem Content="20"/>
+                                <ComboBoxItem Content="30"/>
+                                <ComboBoxItem Content="40"/>
+                                <ComboBoxItem Content="50"/>
+                                <ComboBoxItem Content="60"/>
+                                <ComboBoxItem Content="70"/>
+                                <ComboBoxItem Content="80"/>
+                                <ComboBoxItem Content="90"/>
+                                <ComboBoxItem Content="100"/>
+                            </ComboBox>
+                            <ComboBox x:Name="cbDateAlpha" HorizontalAlignment="Left" Margin="127,68,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8">
+                                <ComboBoxItem Content="10"/>
+                                <ComboBoxItem Content="20"/>
+                                <ComboBoxItem Content="30"/>
+                                <ComboBoxItem Content="40"/>
+                                <ComboBoxItem Content="50"/>
+                                <ComboBoxItem Content="60"/>
+                                <ComboBoxItem Content="70"/>
+                                <ComboBoxItem Content="80"/>
+                                <ComboBoxItem Content="90"/>
+                                <ComboBoxItem Content="100"/>
+                            </ComboBox>
+                            <ComboBox x:Name="cbTimeAlpha" HorizontalAlignment="Left" Margin="127,113,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8">
+                                <ComboBoxItem Content="10"/>
+                                <ComboBoxItem Content="20"/>
+                                <ComboBoxItem Content="30"/>
+                                <ComboBoxItem Content="40"/>
+                                <ComboBoxItem Content="50"/>
+                                <ComboBoxItem Content="60"/>
+                                <ComboBoxItem Content="70"/>
+                                <ComboBoxItem Content="80"/>
+                                <ComboBoxItem Content="90"/>
+                                <ComboBoxItem Content="100"/>
+                            </ComboBox>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox x:Name="gbFormat" Header="格式" HorizontalAlignment="Left" Margin="10,135,0,0" VerticalAlignment="Top" Height="182" Width="195" BorderBrush="#FFC8C8C8">
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
+                            <CheckBox x:Name="chkShowSec" Content="顯示秒數" HorizontalAlignment="Left" Margin="15,15,0,0" VerticalAlignment="Top"/>
+                            <Label x:Name="lbWeekFmt" Content="星期" Margin="10,47,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <Label x:Name="lbDateFmt" Content="日期" Margin="10,85,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                            <ComboBox x:Name="cbWeekFmt" HorizontalAlignment="Left" Margin="55,49,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0">
+                                <ComboBoxItem Content="Wed"/>
+                                <ComboBoxItem Content="Wednesday"/>
+                                <ComboBoxItem Content="星期三"/>
+                            </ComboBox>
+                            <ComboBox x:Name="cbDateFmt" HorizontalAlignment="Left" Margin="55,87,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="4">
+                                <ComboBoxItem Content="12/31"/>
+                                <ComboBoxItem Content="Dec/31"/>
+                                <ComboBoxItem Content="2016/12/31"/>
+                                <ComboBoxItem Content="2016-12-31"/>
+                                <ComboBoxItem Content="2016/Dec/31"/>
+                                <ComboBoxItem Content="2016-Dec-31"/>
+                                <ComboBoxItem Content="12/31/2016"/>
+                                <ComboBoxItem Content="12/31/16"/>
+                                <ComboBoxItem Content="12 月 31 日"/>
+                                <ComboBoxItem Content="2016 年 12 月 31 日"/>
+                            </ComboBox>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="tabNote" Header="便利貼" FontSize="14">
+                <Grid x:Name="gridNote" Background="#FFE5E5E5"/>
+            </TabItem>
+            <TabItem x:Name="tabUsage" Header="效能監控" FontSize="14">
+                <Grid x:Name="gridUsage" Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
