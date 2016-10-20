@@ -20,9 +20,11 @@ using System.Windows.Shapes;
 using zongPanel.Library;
 
 namespace zongPanel {
+
 	/// <summary>主視窗</summary>
 	public partial class MainWindow : Window {
 
+		#region Fields
 		/// <summary>控制核心</summary>
 		private PanelCore mCore;
 		/// <summary>儲存資源檔圖片與其對應的 <see cref="ImageSource"/></summary>
@@ -30,7 +32,9 @@ namespace zongPanel {
 		/// <summary>儲存 <see cref="Image"/> 與其對應的 <see cref="Rect"/></summary>
 		/// <remarks>其中，<see cref="Rect"/> 為 X(Top)、Y(Left)、Width、Height</remarks>
 		private Dictionary<Image, Rect> mImgRect = new Dictionary<Image, Rect>();
+		#endregion
 
+		#region Constructors
 		public MainWindow() {
 			/* 初始化控制項 */
 			InitializeComponent();
@@ -46,7 +50,9 @@ namespace zongPanel {
 			/* 添加滑鼠移動事件，移到 Image Bound 上時顯示之 */
 			this.MouseMove += MainWindow_MouseMove;
 		}
+		#endregion
 
+		#region Methods
 		/// <summary>載入資源檔圖片並轉換為 <see cref="ImageSource"/></summary>
 		private void InitializeImageSources() {
 			/* 建立 Resource 管理器，指向整個專案的 Resource */
@@ -56,13 +62,13 @@ namespace zongPanel {
 			var imgColl = grid.Children.Cast<UIElement>().Where(ui => ui is Image).Cast<Image>();
 			/* 利用 Image.Tag 去抓取對應的 Resource 圖片並加到 Dictionary 裡 */
 			foreach (var img in imgColl) {
-				var res = img.Tag.ToString();							//Tag，應為 Resource 名稱
-				var pic = rm.GetObject(res) as System.Drawing.Bitmap;	//取得其 Resource(Bitmap)
+				var res = img.Tag.ToString();                           //Tag，應為 Resource 名稱
+				var pic = rm.GetObject(res) as System.Drawing.Bitmap;   //取得其 Resource(Bitmap)
 				if (pic != null) {
-					var imgSrc = pic.GetImageSource();		//使用 Stream 方式建立 ImageSource
-					img.Source = imgSrc;					//設定圖片
-					img.Visibility = Visibility.Hidden;		//隱藏
-					mResxImgSrc.Add(img, imgSrc);			//加到 Dictionary 做備份
+					var imgSrc = pic.GetImageSource();      //使用 Stream 方式建立 ImageSource
+					img.Source = imgSrc;                    //設定圖片
+					img.Visibility = Visibility.Hidden;     //隱藏
+					mResxImgSrc.Add(img, imgSrc);           //加到 Dictionary 做備份
 				}
 			}
 		}
@@ -85,7 +91,9 @@ namespace zongPanel {
 				mImgRect.Add(kvp.Key, rect);
 			}
 		}
+		#endregion
 
+		#region UI Events
 		/// <summary>滑鼠移動事件，判斷當前滑鼠位置是否在 <see cref="Image"/> 上，是則顯示之</summary>
 		private void MainWindow_MouseMove(object sender, MouseEventArgs e) {
 			/* 取得滑鼠座標，以 Window 為準 (Gird 應該也行) */
@@ -99,14 +107,14 @@ namespace zongPanel {
 					img.TryInvoke(
 						() => {
 							if (img.Visibility != Visibility.Visible)
-								img.Visibility = Visibility.Visible;	//顯示
+								img.Visibility = Visibility.Visible;    //顯示
 						}
 					);
 				} else {                        //滑鼠座標不在其 Rect 裡
 					img.TryInvoke(
 						() => {
 							if (img.Visibility != Visibility.Hidden)
-								img.Visibility = Visibility.Hidden;		//隱藏
+								img.Visibility = Visibility.Hidden;     //隱藏
 						}
 					);
 				}
@@ -127,5 +135,6 @@ namespace zongPanel {
 				Trace.Write(ex);
 			}
 		}
+		#endregion
 	}
 }

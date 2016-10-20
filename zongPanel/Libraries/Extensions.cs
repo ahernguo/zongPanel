@@ -73,6 +73,13 @@ namespace zongPanel.Library {
 			return System.Drawing.Color.FromArgb(wpfColor.A, wpfColor.R, wpfColor.G, wpfColor.B);
 		}
 
+		/// <summary>將 Drawing.Color 轉換為 Windows.Media.Color</summary>
+		/// <param name="winColor">欲轉換的 <see cref="System.Drawing.Color"/></param>
+		/// <returns><see cref="Color"/></returns>
+		public static Color ToColor(this System.Drawing.Color winColor) {
+			return Color.FromArgb(winColor.A, winColor.R, winColor.G, winColor.B);
+		}
+
 		/// <summary>將 Windows.Media.Brush 轉換為 Drawing.Brush</summary>
 		/// <param name="wpfBrush">欲轉換的 <see cref="Brush"/></param>
 		/// <returns><see cref="System.Drawing.Brush"/></returns>
@@ -97,6 +104,13 @@ namespace zongPanel.Library {
 			return convertColor;
 		}
 
+		/// <summary>取得 Drawing.Color 之對應的 Windows.Media.Brush</summary>
+		/// <param name="wpfBrush">欲轉換的 <see cref="System.Drawing.Color"/></param>
+		/// <returns><see cref="Brush"/></returns>
+		public static Brush GetBrush(this System.Drawing.Color winColor) {
+			return new SolidColorBrush(Color.FromArgb(winColor.A, winColor.R, winColor.G, winColor.B));
+		}
+
 		/// <summary>取得 Windows.Controls.Control 之對應的 Drawing.Font</summary>
 		/// <param name="ctrl">欲轉換的 <see cref="Control"/></param>
 		/// <returns><see cref="System.Drawing.Font"/></returns>
@@ -108,6 +122,43 @@ namespace zongPanel.Library {
 			if (ctrl.FontWeight == FontWeights.Bold) fontStyle |= System.Drawing.FontStyle.Bold;
 
 			return new System.Drawing.Font(fontFamily, emSize, fontStyle);
+		}
+		#endregion
+
+		#region Copies
+		/// <summary>取得 <see cref="System.Drawing.Color"/> 之複製品</summary>
+		/// <param name="color">欲複製的 <see cref="System.Drawing.Color"/></param>
+		/// <returns><see cref="System.Drawing.Color"/></returns>
+		public static System.Drawing.Color Clone(this System.Drawing.Color color) {
+			return System.Drawing.Color.FromArgb(color.A, color.R, color.G, color.B);
+		}
+
+		/// <summary>取得 <see cref="System.Drawing.RectangleF"/> 之複製品</summary>
+		/// <param name="color">欲複製的 <see cref="System.Drawing.RectangleF"/></param>
+		/// <returns><see cref="System.Drawing.RectangleF"/></returns>
+		public static System.Drawing.RectangleF Clone(this System.Drawing.RectangleF rect) {
+			return new System.Drawing.RectangleF(rect.X, rect.Y, rect.Width, rect.Height);
+		}
+
+		/// <summary>取得 <see cref="System.Drawing.SizeF"/> 之複製品</summary>
+		/// <param name="color">欲複製的 <see cref="System.Drawing.SizeF"/></param>
+		/// <returns><see cref="System.Drawing.SizeF"/></returns>
+		public static System.Drawing.SizeF Clone(this System.Drawing.SizeF size) {
+			return new System.Drawing.SizeF(size);
+		}
+
+		/// <summary>取得 <see cref="System.Drawing.Font"/> 之複製品</summary>
+		/// <param name="color">欲複製的 <see cref="System.Drawing.Font"/></param>
+		/// <returns><see cref="System.Drawing.Font"/></returns>
+		public static System.Drawing.Font Copy(this System.Drawing.Font font) {
+			return new System.Drawing.Font(font.FontFamily, font.Size, font.Style, font.Unit, font.GdiCharSet, font.GdiVerticalFont);
+		}
+
+		/// <summary>取得 <see cref="System.Drawing.PointF"/> 之複製品</summary>
+		/// <param name="color">欲複製的 <see cref="System.Drawing.PointF"/></param>
+		/// <returns><see cref="System.Drawing.PointF"/></returns>
+		public static System.Drawing.PointF Clone(this System.Drawing.PointF point) {
+			return new System.Drawing.PointF(point.X, point.Y);
 		}
 		#endregion
 	}
