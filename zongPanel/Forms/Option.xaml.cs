@@ -23,18 +23,25 @@ namespace zongPanel.Forms {
 	public partial class Option : Window {
 
 		#region Fields
-		/// <summary>欲改寫的面板設定資訊</summary>
+		/// <summary>由 <see cref="Window.Owner"/> 所帶入的面板設定資訊</summary>
 		private PanelConfig mConfig;
+		/// <summary>由 <see cref="Window.Owner"/> 所帶入的面板設定資訊複製品</summary>
+		private PanelConfig mCopiedConfig;
 		/// <summary>儲存資源檔圖片與其對應的 <see cref="ImageSource"/></summary>
 		private Dictionary<string, ImageSource> mResxImgSrc = new Dictionary<string, ImageSource>();
+		/// <summary>是否有按下儲存，需覆蓋原始設定資訊</summary>
+		private bool mSaved = false;
 		#endregion
 
 		#region Constructors
+		/// <summary>建立選項視窗，並帶入當前的面板設定資訊</summary>
+		/// <param name="config">目前的面板設定資訊，請帶入原始 instance，會於內部進行複製與修改</param>
 		public Option(PanelConfig config) {
 			InitializeComponent();
 
 			/* 暫存至全域變數 */
 			mConfig = config;
+			mCopiedConfig = mConfig.Clone();
 
 			/* 讀取資源檔圖片並轉換為影像來源 */
 			InitializeImageSources();
@@ -81,13 +88,13 @@ namespace zongPanel.Forms {
 					chk = chkBox.IsChecked.Value;
 				}
 			);
-			mConfig.ChangeShortcut(tag, chk);
+			mCopiedConfig.ChangeShortcut(tag, chk);
 		}
 
 		private void ShowSecondChanged(object sender, RoutedEventArgs e) {
 			CheckBox chkBox = sender as CheckBox;
 			bool chk = chkBox.TryInvoke(() => chkBox.IsChecked.Value);
-			mConfig.ChangeShowSecond(chk);
+			mCopiedConfig.ChangeShowSecond(chk);
 		}
 
 		private void DateWeekFormatChanged(object sender, SelectionChangedEventArgs e) {
@@ -100,14 +107,14 @@ namespace zongPanel.Forms {
 					idx = comboBox.SelectedIndex;
 				}
 			);
-			if ("Week".Equals(tag)) mConfig.ChangeWeekFormat(idx);
-			else if ("Date".Equals(tag)) mConfig.ChangeDateFormat(idx);
+			if ("Week".Equals(tag)) mCopiedConfig.ChangeWeekFormat(idx);
+			else if ("Date".Equals(tag)) mCopiedConfig.ChangeDateFormat(idx);
 		}
 
 		private void FontClicked(object sender, RoutedEventArgs e) {
 			Button btn = sender as Button;
 			string tag = btn.TryInvoke(() => btn.Tag.ToString());
-			mConfig.ChangeFont(tag, btn.GetFont());
+			mCopiedConfig.ChangeFont(tag, btn.GetFont());
 		}
 
 		private void ColorChanged(object sender, MouseButtonEventArgs e) {
@@ -115,7 +122,7 @@ namespace zongPanel.Forms {
 			rect.TryInvoke(
 				() => {
 					string tag = rect.Tag.ToString();
-					Brush br = mConfig.ChangeColor(tag, rect.Fill.GetColor()).GetBrush();
+					Brush br = mCopiedConfig.ChangeColor(tag, rect.Fill.GetColor()).GetBrush();
 					rect.Fill = br;
 				}
 			);
@@ -131,14 +138,31 @@ namespace zongPanel.Forms {
 					idx = comboBox.SelectedIndex;
 				}
 			);
-			mConfig.ChangeAlpha(tag, idx);
+			mCopiedConfig.ChangeAlpha(tag, idx);
 		}
 
 		private void UsageDockChanged(object sender, SelectionChangedEventArgs e) {
 			ComboBox comboBox = sender as ComboBox;
 			int idx = comboBox.TryInvoke(() => comboBox.SelectedIndex);
-			mConfig.ChangeUsageDock(idx);
+			mCopiedConfig.ChangeUsageDock(idx);
 		}
+
+		private void imgSave_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+			mSaved = true;
+			mConfig = mCopiedConfig.Clone();
+		}
+
+		private void imgExit_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+			DialogResult = mSaved;
+			this.TryInvoke(() => this.Close());
+		}
+
 		#endregion
+
+		private void Window_Loaded(object sender, RoutedEventArgs e) {
+			chkNote.Checked += ShortcutChanged;
+			chkRadio.Checked += ShortcutChanged;
+			chkCalc.Checked += ShortcutChanged;
+		}
 	}
 }

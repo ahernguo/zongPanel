@@ -136,5 +136,9 @@ namespace zongPanel {
 			}
 		}
 		#endregion
+
+		private void imgOption_MouseDown(object sender, MouseButtonEventArgs e) {
+			mCore.ShowOptionForm();
+		}
 	}
 }

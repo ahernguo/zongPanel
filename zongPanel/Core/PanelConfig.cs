@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Windows.Forms;
 
 using zongPanel.Library;
@@ -388,6 +389,30 @@ namespace zongPanel {
 		/// <param name="idx">對應 <see cref="UsageDock"/> 的數值</param>
 		public void ChangeUsageDock(int idx) {
 			mEffcDock = (UsageDock)idx;
+		}
+
+		/// <summary>將目前的設定資訊匯出至文件，文件為 DataContract 序列化檔案</summary>
+		/// <param name="path">欲儲存的路徑，如 @"D:\config.xml"</param>
+		public void SaveToFile(string path) {
+			XmlWriterSettings setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
+			using (XmlWriter xw = XmlWriter.Create(path, setting)) {
+				DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
+				contSer.WriteObject(xw, this);
+			}
+		}
+
+		/// <summary>載入已儲存的 DataContract 序列化檔案</summary>
+		/// <param name="path">儲存的檔案路徑，如 @"D:\config.xml"</param>
+		/// <returns>已載入的 <see cref="PanelConfig"/>，若檔案不存在則回傳 <see langword="null"/></returns>
+		public static PanelConfig LoadFromFile(string path) {
+			PanelConfig config = null;
+			if (File.Exists(path)) {
+				using (XmlReader xr = XmlReader.Create(path)) {
+					DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
+					config = contSer.ReadObject(xr) as PanelConfig;
+				}
+			}
+			return config;
 		}
 		#endregion
 	}

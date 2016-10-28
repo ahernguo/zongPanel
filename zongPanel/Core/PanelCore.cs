@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
+using zongPanel.Forms;
 using zongPanel.Library;
 
 namespace zongPanel {
@@ -33,6 +34,8 @@ namespace zongPanel {
 		public event TimeEventArgs TimeChanged;
 		/// <summary>日期變更事件，發報已套用格式之日期與星期</summary>
 		public event DateEventArgs DateChanged;
+		/// <summary>樣式變更事件，發報新的面板資訊設定檔</summary>
+		public event ConfigArgs StyleChanged; 
 		#endregion
 
 		#region Event Raiser
@@ -48,6 +51,14 @@ namespace zongPanel {
 				string dateStr = date.ToString("dd/MM/yyyy");
 
 				DateChanged.BeginInvoke(dateStr, "", null, null);
+			}
+		}
+
+		/// <summary>發報樣式變更事件。可直接帶入原始 instance，方法內會進行設定檔之複製</summary>
+		/// <param name="config">新的面板設定資訊</param>
+		protected virtual void RaiseStyleChanged(PanelConfig config) {
+			if (StyleChanged != null) {
+				StyleChanged.BeginInvoke(config.Clone(), null, null);
 			}
 		}
 		#endregion
@@ -72,7 +83,7 @@ namespace zongPanel {
 			InitializeTraceListener();
 
 			/* 載入設定檔 */
-			InitializeConfiguration();
+			mConfig = InitializeConfiguration();
 		}
 		#endregion
 
@@ -101,25 +112,29 @@ namespace zongPanel {
 		}
 
 		/// <summary>載入設定檔，如未建立設定檔則新建之</summary>
-		private void InitializeConfiguration() {
-			if (File.Exists(mPath["Config"])) {
-				using (XmlReader xr = XmlReader.Create(mPath["Config"])) {
-					DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
-					mConfig = contSer.ReadObject(xr) as PanelConfig;
-				}
-
-			} else {
-				mConfig = new PanelConfig();
-				SaveConfig();
+		/// <returns>載入或新建的設定檔</returns>
+		private PanelConfig InitializeConfiguration() {
+			/* 載入檔案 */
+			PanelConfig config = PanelConfig.LoadFromFile(mPath["Config"]);
+			/* 如果檔案不存在，建立新檔 */
+			if (config == null) {
+				config = new PanelConfig();
+				config.SaveToFile(mPath["Config"]);
 			}
+			return config;
 		}
 
-		/// <summary>以 SOAP 序列化的方式儲存 <see cref="PanelConfig"/></summary>
-		private void SaveConfig() {
-			XmlWriterSettings setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
-			using (XmlWriter xw = XmlWriter.Create(mPath["Config"], setting)) {
-				DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
-				contSer.WriteObject(xw, mConfig);
+		#endregion
+
+		#region Show Forms
+		/// <summary>顯示選項視窗</summary>
+		public void ShowOptionForm() {
+			Option opFrm = new Option(mConfig);
+			//添加修改介面事件
+			bool? dlgRet = opFrm.ShowDialog();
+			if (dlgRet.HasValue && dlgRet.Value) {
+				mConfig.SaveToFile(mPath["Config"]);
+				RaiseStyleChanged(mConfig);
 			}
 		}
 		#endregion
