@@ -199,8 +199,6 @@ namespace zongPanel.Forms {
 			this.TryInvoke(() => this.Close());
 		}
 
-		#endregion
-
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
 			chkNote.Checked += ShortcutChanged;
 			chkRadio.Checked += ShortcutChanged;
@@ -238,5 +236,13 @@ namespace zongPanel.Forms {
 
 			chkShowSec.Checked += ShowSecondChanged;
 		}
+
+		private void Grid_MouseDown(object sender, MouseButtonEventArgs e) {
+			var pos = e.GetPosition(this);
+			if ((e.ChangedButton == MouseButton.Left) && (pos.X < imgSave.Margin.Left))
+				this.DragMove();
+		}
+
+		#endregion
 	}
 }

@@ -7,7 +7,7 @@
         xmlns:zongPanel="clr-namespace:zongPanel" x:Class="zongPanel.Forms.Option"
         mc:Ignorable="d"
         Title="Option" Height="500" Width="422" AllowsTransparency="True" WindowStyle="None" Loaded="Window_Loaded">
-	<Grid x:Name="gridMain" Background="#E5202020">
+	<Grid x:Name="gridMain" Background="#E5202020" MouseDown="Grid_MouseDown">
 		<Label x:Name="lbTitle" Content="設定" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="Gainsboro" FontSize="20"/>
 		<Separator x:Name="lineTitle" HorizontalAlignment="Left" Height="6" Margin="65,25,0,0" VerticalAlignment="Top" Width="272"/>
 		<Image x:Name="imgExit" HorizontalAlignment="Left" Height="30" Margin="380,13,0,0" VerticalAlignment="Top" Width="30" Source="pack://siteoforigin:,,,/Resources/close_org.png" Tag="Close" MouseEnter="ImageMouseEnter" MouseLeave="ImageMouseLeave" MouseLeftButtonUp="imgExit_MouseLeftButtonUp"/>
