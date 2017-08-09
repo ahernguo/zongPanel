@@ -33,14 +33,14 @@
 							<Label x:Name="lbDateStyle" Content="日期" HorizontalAlignment="Left" Margin="10,44,0,0" VerticalAlignment="Top"/>
 							<Label x:Name="lbWeekStyle" Content="星期" HorizontalAlignment="Left" Margin="10,82,0,0" VerticalAlignment="Top"/>
 							<Label x:Name="lbTimeStyle" Content="時間" HorizontalAlignment="Left" Margin="10,120,0,0" VerticalAlignment="Top"/>
-							<Button x:Name="btnDateFont" Content="A" HorizontalAlignment="Left" Margin="50,43,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Date" Click="FontClicked"/>
-							<Button x:Name="btnWeekFont" Content="A" HorizontalAlignment="Left" Margin="50,81,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Week" Click="FontClicked"/>
-							<Button x:Name="btnTimeFont" Content="A" HorizontalAlignment="Left" Margin="50,119,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Time" Click="FontClicked"/>
-							<Rectangle x:Name="rectPnBg" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="50,5,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="PanelBg" MouseLeftButtonUp="ColorChanged"/>
-							<Rectangle x:Name="rectDateColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,43,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="DateFg" MouseLeftButtonUp="ColorChanged"/>
-							<Rectangle x:Name="rectWeekColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,81,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="WeekFg" MouseLeftButtonUp="ColorChanged"/>
-							<Rectangle x:Name="rectTimeColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,119,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="TimeFg" MouseLeftButtonUp="ColorChanged"/>
-							<ComboBox x:Name="cbPnBgAlpha" HorizontalAlignment="Left" Margin="88,8,0,0" VerticalAlignment="Top" Width="60" SelectedIndex="8" Tag="PanelBg" SelectionChanged="AlphaChanged">
+							<Button x:Name="btnDateFont" Content="A" HorizontalAlignment="Left" Margin="50,43,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Date"/>
+							<Button x:Name="btnWeekFont" Content="A" HorizontalAlignment="Left" Margin="50,81,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Week"/>
+							<Button x:Name="btnTimeFont" Content="A" HorizontalAlignment="Left" Margin="50,119,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Time"/>
+							<Rectangle x:Name="rectPnBg" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="50,5,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="PanelBg"/>
+							<Rectangle x:Name="rectDateColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,43,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="DateFg"/>
+							<Rectangle x:Name="rectWeekColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,81,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="WeekFg"/>
+							<Rectangle x:Name="rectTimeColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="88,119,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="TimeFg"/>
+							<ComboBox x:Name="cbPnBgAlpha" HorizontalAlignment="Left" Margin="88,8,0,0" VerticalAlignment="Top" Width="60" SelectedIndex="8" Tag="PanelBg">
 								<ComboBoxItem Content="10"/>
 								<ComboBoxItem Content="20"/>
 								<ComboBoxItem Content="30"/>
@@ -52,7 +52,7 @@
 								<ComboBoxItem Content="90"/>
 								<ComboBoxItem Content="100"/>
 							</ComboBox>
-							<ComboBox x:Name="cbWeekAlpha" HorizontalAlignment="Left" Margin="127,46,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="DateFg" SelectionChanged="AlphaChanged">
+							<ComboBox x:Name="cbWeekAlpha" HorizontalAlignment="Left" Margin="127,46,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="DateFg">
 								<ComboBoxItem Content="10"/>
 								<ComboBoxItem Content="20"/>
 								<ComboBoxItem Content="30"/>
@@ -64,7 +64,7 @@
 								<ComboBoxItem Content="90"/>
 								<ComboBoxItem Content="100"/>
 							</ComboBox>
-							<ComboBox x:Name="cbDateAlpha" HorizontalAlignment="Left" Margin="127,84,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="WeekFg" SelectionChanged="AlphaChanged">
+							<ComboBox x:Name="cbDateAlpha" HorizontalAlignment="Left" Margin="127,84,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="WeekFg">
 								<ComboBoxItem Content="10"/>
 								<ComboBoxItem Content="20"/>
 								<ComboBoxItem Content="30"/>
@@ -76,7 +76,7 @@
 								<ComboBoxItem Content="90"/>
 								<ComboBoxItem Content="100"/>
 							</ComboBox>
-							<ComboBox x:Name="cbTimeAlpha" HorizontalAlignment="Left" Margin="127,122,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="TimeFg" SelectionChanged="AlphaChanged">
+							<ComboBox x:Name="cbTimeAlpha" HorizontalAlignment="Left" Margin="127,122,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="TimeFg">
 								<ComboBoxItem Content="10"/>
 								<ComboBoxItem Content="20"/>
 								<ComboBoxItem Content="30"/>
@@ -92,16 +92,16 @@
 					</GroupBox>
 					<GroupBox x:Name="gbFormat" Header="格式" HorizontalAlignment="Left" Margin="10,135,0,0" VerticalAlignment="Top" Height="182" Width="195" BorderBrush="#FFC8C8C8">
 						<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
-							<CheckBox x:Name="chkShowSec" Content="顯示秒數" HorizontalAlignment="Left" Margin="15,15,0,0" VerticalAlignment="Top" Checked="ShowSecondChanged"/>
+							<CheckBox x:Name="chkShowSec" Content="顯示秒數" HorizontalAlignment="Left" Margin="15,15,0,0" VerticalAlignment="Top"/>
 							<Label x:Name="lbWeekFmt" Content="星期" Margin="10,47,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 							<Label x:Name="lbDateFmt" Content="日期" Margin="10,85,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-							<ComboBox x:Name="cbWeekFmt" HorizontalAlignment="Left" Margin="55,49,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" SelectionChanged="DateWeekFormatChanged" Tag="Week">
+							<ComboBox x:Name="cbWeekFmt" HorizontalAlignment="Left" Margin="55,49,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" Tag="Week">
 								<ComboBoxItem Content="Wed"/>
 								<ComboBoxItem Content="Wednesday"/>
 								<ComboBoxItem Content="週三"/>
 								<ComboBoxItem Content="星期三"/>
 							</ComboBox>
-							<ComboBox x:Name="cbDateFmt" HorizontalAlignment="Left" Margin="55,87,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="4" SelectionChanged="DateWeekFormatChanged" Tag="Date">
+							<ComboBox x:Name="cbDateFmt" HorizontalAlignment="Left" Margin="55,87,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="4" Tag="Date">
 								<ComboBoxItem Content="12/31"/>
 								<ComboBoxItem Content="Dec/31"/>
 								<ComboBoxItem Content="2016/12/31"/>
@@ -122,12 +122,12 @@
 					<Label x:Name="lbNoteBg" Content="背景" HorizontalAlignment="Left" Margin="30,30,0,0" VerticalAlignment="Top"/>
 					<Label x:Name="lbNoteTit" Content="標題" HorizontalAlignment="Left" Margin="30,70,0,0" VerticalAlignment="Top"/>
 					<Label x:Name="lbNoteCnt" Content="內容" HorizontalAlignment="Left" Margin="30,111,0,0" VerticalAlignment="Top"/>
-					<Button x:Name="btnNoteTitFont" Content="A" HorizontalAlignment="Left" Margin="70,69,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Title" Click="FontClicked"/>
-					<Button x:Name="btnNoteCntFont" Content="A" HorizontalAlignment="Left" Margin="70,110,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Content" Click="FontClicked"/>
-					<Rectangle x:Name="rectNoteBg" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="70,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="NoteBg" MouseLeftButtonUp="ColorChanged"/>
-					<Rectangle x:Name="rectNoteTitColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="108,69,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="NoteTitFg" MouseLeftButtonUp="ColorChanged"/>
-					<Rectangle x:Name="rectNoteCntColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="108,110,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="NoteCntFg" MouseLeftButtonUp="ColorChanged"/>
-					<ComboBox x:Name="cbNoteBgAlpha" HorizontalAlignment="Left" Margin="108,32,0,0" VerticalAlignment="Top" Width="60" SelectedIndex="8" Tag="NoteBg" SelectionChanged="AlphaChanged">
+					<Button x:Name="btnNoteTitFont" Content="A" HorizontalAlignment="Left" Margin="70,69,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Title"/>
+					<Button x:Name="btnNoteCntFont" Content="A" HorizontalAlignment="Left" Margin="70,110,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Content"/>
+					<Rectangle x:Name="rectNoteBg" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="70,29,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="NoteBg"/>
+					<Rectangle x:Name="rectNoteTitColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="108,69,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="NoteTitFg"/>
+					<Rectangle x:Name="rectNoteCntColor" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="108,110,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="NoteCntFg"/>
+					<ComboBox x:Name="cbNoteBgAlpha" HorizontalAlignment="Left" Margin="108,32,0,0" VerticalAlignment="Top" Width="60" SelectedIndex="8" Tag="NoteBg">
 						<ComboBoxItem Content="10"/>
 						<ComboBoxItem Content="20"/>
 						<ComboBoxItem Content="30"/>
@@ -139,7 +139,7 @@
 						<ComboBoxItem Content="90"/>
 						<ComboBoxItem Content="100"/>
 					</ComboBox>
-					<ComboBox x:Name="cbNoteTitAlpha" HorizontalAlignment="Left" Margin="147,72,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="NoteTitFg" SelectionChanged="AlphaChanged">
+					<ComboBox x:Name="cbNoteTitAlpha" HorizontalAlignment="Left" Margin="147,72,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="NoteTitFg">
 						<ComboBoxItem Content="10"/>
 						<ComboBoxItem Content="20"/>
 						<ComboBoxItem Content="30"/>
@@ -151,7 +151,7 @@
 						<ComboBoxItem Content="90"/>
 						<ComboBoxItem Content="100"/>
 					</ComboBox>
-					<ComboBox x:Name="cbNoteCntAlpha" HorizontalAlignment="Left" Margin="147,113,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="NoteCntFg" SelectionChanged="AlphaChanged">
+					<ComboBox x:Name="cbNoteCntAlpha" HorizontalAlignment="Left" Margin="147,113,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="NoteCntFg">
 						<ComboBoxItem Content="10"/>
 						<ComboBoxItem Content="20"/>
 						<ComboBoxItem Content="30"/>
@@ -169,14 +169,14 @@
 				<Grid x:Name="gridUsage" Background="#FFE5E5E5">
 					<Label x:Name="lbUsgDock" Content="停靠點" Margin="30,30,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 					<Label x:Name="lbUsgFont" Content="文字" HorizontalAlignment="Left" Margin="30,70,0,0" VerticalAlignment="Top"/>
-					<Button x:Name="btnUsgFont" Content="A" HorizontalAlignment="Left" Margin="90,69,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Usage" Click="FontClicked"/>
-					<Rectangle x:Name="rectUsgFont" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="130,69,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="UsageFg" MouseLeftButtonUp="ColorChanged"/>
-					<ComboBox x:Name="cbUsgDock" Margin="90,32,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="70" SelectedIndex="0" SelectionChanged="UsageDockChanged">
+					<Button x:Name="btnUsgFont" Content="A" HorizontalAlignment="Left" Margin="90,69,0,0" VerticalAlignment="Top" Width="30" Height="30" Tag="Usage"/>
+					<Rectangle x:Name="rectUsgFont" Fill="#FFF4F4F5" HorizontalAlignment="Left" Margin="130,69,0,0" Stroke="Black" VerticalAlignment="Top" Width="30" Height="30" Tag="UsageFg"/>
+					<ComboBox x:Name="cbUsgDock" Margin="90,32,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="70" SelectedIndex="0">
 						<ComboBoxItem Content="不顯示"/>
 						<ComboBoxItem Content="上"/>
 						<ComboBoxItem Content="下"/>
 					</ComboBox>
-					<ComboBox x:Name="cbUsgFontAlpha" HorizontalAlignment="Left" Margin="170,72,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="UsageFg" SelectionChanged="AlphaChanged">
+					<ComboBox x:Name="cbUsgFontAlpha" HorizontalAlignment="Left" Margin="170,72,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="UsageFg">
 						<ComboBoxItem Content="10"/>
 						<ComboBoxItem Content="20"/>
 						<ComboBoxItem Content="30"/>

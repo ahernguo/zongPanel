@@ -22,6 +22,11 @@ namespace zongPanel.Forms {
 	/// </summary>
 	public partial class Option : Window {
 
+		#region Definitions
+		/// <summary>顯示字體切換按鈕之 <see cref="Control.FontSize"/></summary>
+		private static readonly float BTN_FONT_SIZE = 14;
+		#endregion
+
 		#region Fields
 		/// <summary>由 <see cref="Window.Owner"/> 所帶入的面板設定資訊</summary>
 		private PanelConfig mConfig;
@@ -62,6 +67,42 @@ namespace zongPanel.Forms {
 			mResxImgSrc.Add("CloseOrg", pic.GetImageSource());
 			pic = rm.GetObject("close") as System.Drawing.Bitmap;
 			mResxImgSrc.Add("CloseHover", pic.GetImageSource());
+
+			imgExit.Source = mResxImgSrc["CloseOrg"];
+			imgSave.Source = mResxImgSrc["SaveOrg"];
+		}
+
+		private int CalculateAlphaToSelectedIndex(System.Drawing.Color color) {
+			int alpha = (color.A / 255) * 100;
+
+			int quotient = alpha / 10;
+			if ((alpha % 10) > 5) quotient++;
+
+			return quotient - 1;
+		}
+
+		private void LoadConfig(PanelConfig config) {
+			chkShowSec.IsChecked = config.ShowSecond;
+
+			chkCalc.IsChecked = config.Shortcuts.HasFlag(Shortcut.CALCULATOR);
+			chkNote.IsChecked = config.Shortcuts.HasFlag(Shortcut.NOTE);
+			chkRadio.IsChecked = config.Shortcuts.HasFlag(Shortcut.RADIO);
+
+			cbDateAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.DateForeground);
+			cbNoteBgAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.NoteBackground);
+			cbNoteCntAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.NoteContentForeground);
+			cbNoteTitAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.NoteTitleForeground);
+			cbPnBgAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.PanelBackground);
+			cbTimeAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.TimeForeground);
+			cbUsgFontAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.UsageForeground);
+			cbWeekAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.WeekForeground);
+
+			btnDateFont.SetFont(config.DateFont, BTN_FONT_SIZE);
+			btnNoteCntFont.SetFont(config.NoteContentFont, BTN_FONT_SIZE);
+			btnNoteTitFont.SetFont(config.NoteTitleFont, BTN_FONT_SIZE);
+			btnTimeFont.SetFont(config.TimeFont, BTN_FONT_SIZE);
+			btnUsgFont.SetFont(config.UsageFont, BTN_FONT_SIZE);
+			btnWeekFont.SetFont(config.WeekFont, BTN_FONT_SIZE);
 		}
 		#endregion
 
@@ -114,7 +155,8 @@ namespace zongPanel.Forms {
 		private void FontClicked(object sender, RoutedEventArgs e) {
 			Button btn = sender as Button;
 			string tag = btn.TryInvoke(() => btn.Tag.ToString());
-			mCopiedConfig.ChangeFont(tag, btn.GetFont());
+			var newFont = mCopiedConfig.ChangeFont(tag);
+			if (newFont != null) btn.TryInvoke(() => btn.SetFont(newFont, BTN_FONT_SIZE));
 		}
 
 		private void ColorChanged(object sender, MouseButtonEventArgs e) {
@@ -163,6 +205,38 @@ namespace zongPanel.Forms {
 			chkNote.Checked += ShortcutChanged;
 			chkRadio.Checked += ShortcutChanged;
 			chkCalc.Checked += ShortcutChanged;
+
+			cbUsgDock.SelectionChanged += UsageDockChanged;
+
+			cbDateAlpha.SelectionChanged += AlphaChanged;
+			cbNoteBgAlpha.SelectionChanged += AlphaChanged;
+			cbNoteCntAlpha.SelectionChanged += AlphaChanged;
+			cbNoteTitAlpha.SelectionChanged += AlphaChanged;
+			cbPnBgAlpha.SelectionChanged += AlphaChanged;
+			cbTimeAlpha.SelectionChanged += AlphaChanged;
+			cbUsgFontAlpha.SelectionChanged += AlphaChanged;
+			cbWeekAlpha.SelectionChanged += AlphaChanged;
+
+			rectDateColor.MouseLeftButtonUp += ColorChanged;
+			rectNoteBg.MouseLeftButtonUp += ColorChanged;
+			rectNoteCntColor.MouseLeftButtonUp += ColorChanged;
+			rectNoteTitColor.MouseLeftButtonUp += ColorChanged;
+			rectPnBg.MouseLeftButtonUp += ColorChanged;
+			rectTimeColor.MouseLeftButtonUp += ColorChanged;
+			rectUsgFont.MouseLeftButtonUp += ColorChanged;
+			rectWeekColor.MouseLeftButtonUp += ColorChanged;
+
+			btnDateFont.Click += FontClicked;
+			btnNoteCntFont.Click += FontClicked;
+			btnNoteTitFont.Click += FontClicked;
+			btnTimeFont.Click += FontClicked;
+			btnUsgFont.Click += FontClicked;
+			btnWeekFont.Click += FontClicked;
+
+			cbDateFmt.SelectionChanged += DateWeekFormatChanged;
+			cbWeekFmt.SelectionChanged += DateWeekFormatChanged;
+
+			chkShowSec.Checked += ShowSecondChanged;
 		}
 	}
 }
