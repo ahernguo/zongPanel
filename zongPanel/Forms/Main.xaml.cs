@@ -126,7 +126,7 @@ namespace zongPanel {
 		}
 
 		/// <summary>開啟計算機</summary>
-		private void imgCalc_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+		private void CalcClicked(object sender, MouseButtonEventArgs e) {
 			try {
 				/* 直接開啟，不需等待結束 */
 				Process.Start("calc");
@@ -134,10 +134,12 @@ namespace zongPanel {
 				Trace.Write(ex);
 			}
 		}
-		#endregion
 
-		private void imgOption_MouseDown(object sender, MouseButtonEventArgs e) {
+		/// <summary>開啟選項視窗</summary>
+		private void OptionClicked(object sender, MouseButtonEventArgs e) {
 			mCore.ShowOptionForm();
 		}
+
+		#endregion
 	}
 }
