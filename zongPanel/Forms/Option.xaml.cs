@@ -29,7 +29,7 @@ namespace zongPanel.Forms {
 
 		#region Fields
 		/// <summary>由 <see cref="Window.Owner"/> 所帶入的面板設定資訊</summary>
-		private PanelConfig mConfig;
+		private PanelConfig rConfig;
 		/// <summary>由 <see cref="Window.Owner"/> 所帶入的面板設定資訊複製品</summary>
 		private PanelConfig mCopiedConfig;
 		/// <summary>儲存資源檔圖片與其對應的 <see cref="ImageSource"/></summary>
@@ -45,8 +45,8 @@ namespace zongPanel.Forms {
 			InitializeComponent();
 
 			/* 暫存至全域變數 */
-			mConfig = config;
-			mCopiedConfig = mConfig.Clone();
+			rConfig = config;
+			mCopiedConfig = rConfig.Clone();
 
 			/* 讀取資源檔圖片並轉換為影像來源 */
 			InitializeImageSources();
@@ -191,7 +191,7 @@ namespace zongPanel.Forms {
 
 		private void imgSave_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
 			mSaved = true;
-			mConfig = mCopiedConfig.Clone();
+			rConfig = mCopiedConfig.Clone();
 		}
 
 		private void imgExit_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
@@ -239,7 +239,8 @@ namespace zongPanel.Forms {
 
 		private void Grid_MouseDown(object sender, MouseButtonEventArgs e) {
 			var pos = e.GetPosition(this);
-			if ((e.ChangedButton == MouseButton.Left) && (pos.X < imgSave.Margin.Left))
+			var posAllow = (pos.X > 0) && (pos.Y > 0) && (pos.X < imgSave.Margin.Left) && (pos.Y < tabControl.Margin.Top);
+			if ((e.ChangedButton == MouseButton.Left) && posAllow)
 				this.DragMove();
 		}
 
