@@ -336,12 +336,11 @@ namespace zongPanel {
 
 		/// <summary>設定字體樣式，調用 <see cref="FontDialog"/> 供使用者選取</summary>
 		/// <param name="tag">欲設定的控制項名稱</param>
-		/// <param name="oriFont">當前控制項的字體</param>
 		/// <remarks>目前採用 Tag 方式，請注意參照建構元的預設名稱</remarks>
-		public void ChangeFont(string tag, Font oriFont = null) {
+		public Font ChangeFont(string tag) {
 			Font font = null;
 			using (FontDialog dialog = new FontDialog()) {
-				if (oriFont != null) dialog.Font = oriFont.Clone() as Font;
+				if (mFonts[tag] != null) dialog.Font = mFonts[tag].Clone() as Font;
 				if (dialog.ShowDialog() == DialogResult.OK) {
 					font = dialog.Font.Clone() as Font;
 				}
@@ -349,6 +348,8 @@ namespace zongPanel {
 
 			if (font != null && mFonts.ContainsKey(tag))
 				mFonts[tag] = font;
+
+			return font;
 		}
 
 		/// <summary>設定相關顏色，調用 <see cref="ColorDialog"/> 供使用者選取</summary>
@@ -379,7 +380,7 @@ namespace zongPanel {
 		/// <remarks>目前採用 Tag 方式，請注意參照建構元的預設名稱</remarks>
 		public void ChangeAlpha(string tag, int idx) {
 			if (mColors.ContainsKey(tag)) {
-				int alpha = ((idx + 1) * 10) * 255;
+				int alpha = ((idx + 1) / 10) * 255;
 				Color oriClr = mColors[tag];
 				mColors[tag] = Color.FromArgb(alpha, oriClr);
 			}
