@@ -239,9 +239,9 @@ namespace zongPanel {
 		/// <summary>取得此設定檔之複製品，深層複製</summary>
 		public PanelConfig Clone() {
 			PanelConfig copied = null;
-			using (MemoryStream ms = new MemoryStream()) {
+			using (var ms = new MemoryStream()) {
 				/* 將目前的資訊序列化儲存至 MemoryStream 裡 */
-				DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
+				var contSer = new DataContractSerializer(typeof(PanelConfig));
 				contSer.WriteObject(ms, this);
 				/* 從 MemoryStream 做反序列化，此即複製品 */
 				ms.Position = 0;
@@ -270,7 +270,8 @@ namespace zongPanel {
 		/// <param name="idx">樣式代碼</param>
 		/// <remarks>目前是直接寫死，請注意參照!</remarks>
 		public void ChangeWeekFormat(int idx) {
-			string fmt = string.Empty, cult = string.Empty;
+			var fmt = string.Empty;
+			var cult = string.Empty;
 			switch (idx) {
 				case 0:
 					fmt = "ddd"; cult = "en-US";
@@ -295,7 +296,8 @@ namespace zongPanel {
 		/// <param name="idx">樣式代碼</param>
 		/// <remarks>目前是直接寫死，請注意參照!</remarks>
 		public void ChangeDateFormat(int idx) {
-			string fmt = string.Empty, cult = string.Empty;
+			var fmt = string.Empty;
+			var cult = string.Empty;
 			switch (idx) {
 				case 0:
 					fmt = @"MM/dd"; cult = "en-US";
@@ -339,7 +341,7 @@ namespace zongPanel {
 		/// <remarks>目前採用 Tag 方式，請注意參照建構元的預設名稱</remarks>
 		public Font ChangeFont(string tag) {
 			Font font = null;
-			using (FontDialog dialog = new FontDialog()) {
+			using (var dialog = new FontDialog()) {
 				if (mFonts[tag] != null) dialog.Font = mFonts[tag].Clone() as Font;
 				if (dialog.ShowDialog() == DialogResult.OK) {
 					font = dialog.Font.Clone() as Font;
@@ -357,8 +359,8 @@ namespace zongPanel {
 		/// <param name="oriColor">當前顯示的顏色</param>
 		/// <remarks>目前採用 Tag 方式，請注意參照建構元的預設名稱</remarks>
 		public Color ChangeColor(string tag, Color oriColor) {
-			Color clr = Color.Empty;
-			using (ColorDialog dialog = new ColorDialog()) {
+			var clr = Color.Empty;
+			using (var dialog = new ColorDialog()) {
 				dialog.AllowFullOpen = true;
 				dialog.AnyColor = true;
 				dialog.FullOpen = true;
@@ -395,9 +397,9 @@ namespace zongPanel {
 		/// <summary>將目前的設定資訊匯出至文件，文件為 DataContract 序列化檔案</summary>
 		/// <param name="path">欲儲存的路徑，如 @"D:\config.xml"</param>
 		public void SaveToFile(string path) {
-			XmlWriterSettings setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
-			using (XmlWriter xw = XmlWriter.Create(path, setting)) {
-				DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
+			var setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
+			using (var xw = XmlWriter.Create(path, setting)) {
+				var contSer = new DataContractSerializer(typeof(PanelConfig));
 				contSer.WriteObject(xw, this);
 			}
 		}
@@ -408,8 +410,8 @@ namespace zongPanel {
 		public static PanelConfig LoadFromFile(string path) {
 			PanelConfig config = null;
 			if (File.Exists(path)) {
-				using (XmlReader xr = XmlReader.Create(path)) {
-					DataContractSerializer contSer = new DataContractSerializer(typeof(PanelConfig));
+				using (var xr = XmlReader.Create(path)) {
+					var contSer = new DataContractSerializer(typeof(PanelConfig));
 					config = contSer.ReadObject(xr) as PanelConfig;
 				}
 			}

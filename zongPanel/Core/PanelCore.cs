@@ -67,7 +67,7 @@ namespace zongPanel {
 		public PanelCore() {
 
 			/* 取得相關資料夾與檔案路徑 */
-			string path = Environment.GetEnvironmentVariable("userprofile") + @"\Documents\zongPanel\";
+			var path = Environment.GetEnvironmentVariable("userprofile") + @"\Documents\zongPanel\";
 			mPath.Add("Main", path);
 			path = mPath["Main"] + "Config.xml";
 			mPath.Add("Config", path);
@@ -101,7 +101,7 @@ namespace zongPanel {
 			/* 清除預設的監聽器 */
 			Trace.Listeners.Clear();
 			/* 建立 XML 紀錄器 */
-			DailyXmlListener dailyListener = new DailyXmlListener(mPath["Log"]) {
+			var dailyListener = new DailyXmlListener(mPath["Log"]) {
 				Filter = new EventTypeFilter(SourceLevels.All),
 				TraceOutputOptions = TraceOptions.Callstack | TraceOptions.DateTime | TraceOptions.ProcessId | TraceOptions.ThreadId
 			};
@@ -115,7 +115,7 @@ namespace zongPanel {
 		/// <returns>載入或新建的設定檔</returns>
 		private PanelConfig InitializeConfiguration() {
 			/* 載入檔案 */
-			PanelConfig config = PanelConfig.LoadFromFile(mPath["Config"]);
+			var config = PanelConfig.LoadFromFile(mPath["Config"]);
 			/* 如果檔案不存在，建立新檔 */
 			if (config == null) {
 				config = new PanelConfig();
@@ -129,9 +129,9 @@ namespace zongPanel {
 		#region Show Forms
 		/// <summary>顯示選項視窗</summary>
 		public void ShowOptionForm() {
-			Option opFrm = new Option(mConfig);
+			var opFrm = new Option(mConfig);
 			//添加修改介面事件
-			bool? dlgRet = opFrm.ShowDialog();
+			var dlgRet = opFrm.ShowDialog();
 			if (dlgRet.HasValue && dlgRet.Value) {
 				mConfig.SaveToFile(mPath["Config"]);
 				RaiseStyleChanged(mConfig);

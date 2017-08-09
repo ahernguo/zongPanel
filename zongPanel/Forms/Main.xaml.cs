@@ -56,15 +56,14 @@ namespace zongPanel {
 		/// <summary>載入資源檔圖片並轉換為 <see cref="ImageSource"/></summary>
 		private void InitializeImageSources() {
 			/* 建立 Resource 管理器，指向整個專案的 Resource */
-			ResourceManager rm = new ResourceManager("zongPanel.Properties.Resources", Assembly.GetExecutingAssembly());
+			var rm = new ResourceManager("zongPanel.Properties.Resources", Assembly.GetExecutingAssembly());
 
 			/* 抓取 Images */
 			var imgColl = grid.Children.Cast<UIElement>().Where(ui => ui is Image).Cast<Image>();
 			/* 利用 Image.Tag 去抓取對應的 Resource 圖片並加到 Dictionary 裡 */
 			foreach (var img in imgColl) {
 				var res = img.Tag.ToString();                           //Tag，應為 Resource 名稱
-				var pic = rm.GetObject(res) as System.Drawing.Bitmap;   //取得其 Resource(Bitmap)
-				if (pic != null) {
+				if (rm.GetObject(res) is System.Drawing.Bitmap pic) {   //取得其 Resource(Bitmap)
 					var imgSrc = pic.GetImageSource();      //使用 Stream 方式建立 ImageSource
 					img.Source = imgSrc;                    //設定圖片
 					img.Visibility = Visibility.Hidden;     //隱藏
@@ -78,14 +77,14 @@ namespace zongPanel {
 			float x = 0, y = 0;
 			foreach (var kvp in mResxImgSrc) {
 				/* 縮寫 */
-				Thickness margin = kvp.Key.Margin;
+				var margin = kvp.Key.Margin;
 
 				/* 取得 Top、Left 座標，暫時找不到對應的方法... */
 				x = (float)((margin.Left > margin.Right) ? margin.Left : (this.Width - margin.Right - kvp.Key.Width));
 				y = (float)((margin.Top > margin.Bottom) ? margin.Top : (this.Height - margin.Bottom - kvp.Key.Height));
 
 				/* 建立 Rect */
-				Rect rect = new Rect(x, y, kvp.Key.Width, kvp.Key.Height);
+				var rect = new Rect(x, y, kvp.Key.Width, kvp.Key.Height);
 
 				/* 加到集合 */
 				mImgRect.Add(kvp.Key, rect);
@@ -101,7 +100,7 @@ namespace zongPanel {
 			/* 查看每個 Image，檢查滑鼠座標是否在其對應的 Rect 裡，是則顯示，反之隱藏 */
 			foreach (var kvp in mImgRect) {
 				/* 縮寫 */
-				Image img = kvp.Key;
+				var img = kvp.Key;
 				/* 判斷是否滑鼠座標在範圍內 */
 				if (kvp.Value.Contains(pos)) {  //滑鼠座標在其 Rect 裡
 					img.TryInvoke(
@@ -122,7 +121,7 @@ namespace zongPanel {
 		}
 
 		/// <summary>關閉應用程式</summary>
-		private void imgExit_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+		private void ExitClicked(object sender, MouseButtonEventArgs e) {
 			this.TryAsyncInvoke(() => this.Close());
 		}
 

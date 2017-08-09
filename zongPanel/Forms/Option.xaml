@@ -10,8 +10,8 @@
 	<Grid x:Name="gridMain" Background="#E5202020" MouseDown="Grid_MouseDown">
 		<Label x:Name="lbTitle" Content="設定" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="Gainsboro" FontSize="20"/>
 		<Separator x:Name="lineTitle" HorizontalAlignment="Left" Height="6" Margin="65,25,0,0" VerticalAlignment="Top" Width="272"/>
-		<Image x:Name="imgExit" HorizontalAlignment="Left" Height="30" Margin="380,13,0,0" VerticalAlignment="Top" Width="30" Source="pack://siteoforigin:,,,/Resources/close_org.png" Tag="Close" MouseEnter="ImageMouseEnter" MouseLeave="ImageMouseLeave" MouseLeftButtonUp="imgExit_MouseLeftButtonUp"/>
-		<Image x:Name="imgSave" HorizontalAlignment="Left" Height="30" Margin="345,13,0,0" VerticalAlignment="Top" Width="30" Source="pack://siteoforigin:,,,/Resources/save_org.png" Tag="Save" MouseEnter="ImageMouseEnter" MouseLeave="ImageMouseLeave" MouseLeftButtonUp="imgSave_MouseLeftButtonUp"/>
+		<Image x:Name="imgExit" HorizontalAlignment="Left" Height="30" Margin="380,13,0,0" VerticalAlignment="Top" Width="30" Source="pack://siteoforigin:,,,/Resources/close_org.png" Tag="Close" MouseEnter="ImageMouseEnter" MouseLeave="ImageMouseLeave" MouseLeftButtonUp="ExitClicked"/>
+		<Image x:Name="imgSave" HorizontalAlignment="Left" Height="30" Margin="345,13,0,0" VerticalAlignment="Top" Width="30" Source="pack://siteoforigin:,,,/Resources/save_org.png" Tag="Save" MouseEnter="ImageMouseEnter" MouseLeave="ImageMouseLeave" MouseLeftButtonUp="SaveClicked"/>
 		<TabControl x:Name="tabControl" Margin="0,50,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
 			<TabItem x:Name="tabPanel" Header="面板" FontSize="14">
 				<Grid x:Name="gridPanel" Background="#FFE5E5E5" Margin="0,1,0,-1">

@@ -57,7 +57,7 @@ namespace zongPanel.Forms {
 		/// <summary>載入資源檔圖片並轉換為 <see cref="ImageSource"/></summary>
 		private void InitializeImageSources() {
 			/* 建立 Resource 管理器，指向整個專案的 Resource */
-			ResourceManager rm = new ResourceManager("zongPanel.Properties.Resources", Assembly.GetExecutingAssembly());
+			var rm = new ResourceManager("zongPanel.Properties.Resources", Assembly.GetExecutingAssembly());
 
 			var pic = rm.GetObject("save_org") as System.Drawing.Bitmap;
 			mResxImgSrc.Add("SaveOrg", pic.GetImageSource());
@@ -72,15 +72,19 @@ namespace zongPanel.Forms {
 			imgSave.Source = mResxImgSrc["SaveOrg"];
 		}
 
+		/// <summary>將 <see cref="System.Drawing.Color.A"/> 轉換為 10 級距的 Index，供 <see cref="ComboBox.SelectedIndex"/> 使用</summary>
+		/// <param name="color">欲判斷的顏色</param>
+		/// <returns>10 級距的 Index</returns>
 		private int CalculateAlphaToSelectedIndex(System.Drawing.Color color) {
-			int alpha = (color.A / 255) * 100;
-
-			int quotient = alpha / 10;
+			var alpha = (color.A / 255) * 100;
+			var quotient = alpha / 10;
 			if ((alpha % 10) > 5) quotient++;
 
 			return quotient - 1;
 		}
 
+		/// <summary>將 <see cref="PanelConfig"/> 之設定套用到當前的控制項</summary>
+		/// <param name="config">欲套用的設定檔</param>
 		private void LoadConfig(PanelConfig config) {
 			chkShowSec.IsChecked = config.ShowSecond;
 
@@ -108,21 +112,21 @@ namespace zongPanel.Forms {
 
 		#region UI Events
 		private void ImageMouseEnter(object sender, MouseEventArgs e) {
-			Image img = sender as Image;
-			string resName = $"{img.Tag.ToString()}Hover";
+			var img = sender as Image;
+			var resName = $"{img.Tag.ToString()}Hover";
 			img.TryInvoke(() => img.Source = mResxImgSrc[resName]);
 		}
 
 		private void ImageMouseLeave(object sender, MouseEventArgs e) {
-			Image img = sender as Image;
-			string resName = $"{img.Tag.ToString()}Org";
+			var img = sender as Image;
+			var resName = $"{img.Tag.ToString()}Org";
 			img.TryInvoke(() => img.Source = mResxImgSrc[resName]);
 		}
 
 		private void ShortcutChanged(object sender, RoutedEventArgs e) {
-			CheckBox chkBox = sender as CheckBox;
-			string tag = string.Empty;
-			bool chk = false;
+			var chkBox = sender as CheckBox;
+			var tag = string.Empty;
+			var chk = false;
 			chkBox.TryInvoke(
 				() => {
 					tag = chkBox.Tag.ToString();
@@ -133,15 +137,15 @@ namespace zongPanel.Forms {
 		}
 
 		private void ShowSecondChanged(object sender, RoutedEventArgs e) {
-			CheckBox chkBox = sender as CheckBox;
-			bool chk = chkBox.TryInvoke(() => chkBox.IsChecked.Value);
+			var chkBox = sender as CheckBox;
+			var chk = chkBox.TryInvoke(() => chkBox.IsChecked.Value);
 			mCopiedConfig.ChangeShowSecond(chk);
 		}
 
 		private void DateWeekFormatChanged(object sender, SelectionChangedEventArgs e) {
-			ComboBox comboBox = sender as ComboBox;
-			string tag = string.Empty;
-			int idx = 0;
+			var comboBox = sender as ComboBox;
+			var tag = string.Empty;
+			var idx = 0;
 			comboBox.TryInvoke(
 				() => {
 					tag = comboBox.Tag.ToString();
@@ -153,14 +157,14 @@ namespace zongPanel.Forms {
 		}
 
 		private void FontClicked(object sender, RoutedEventArgs e) {
-			Button btn = sender as Button;
-			string tag = btn.TryInvoke(() => btn.Tag.ToString());
+			var btn = sender as Button;
+			var tag = btn.TryInvoke(() => btn.Tag.ToString());
 			var newFont = mCopiedConfig.ChangeFont(tag);
 			if (newFont != null) btn.TryInvoke(() => btn.SetFont(newFont, BTN_FONT_SIZE));
 		}
 
 		private void ColorChanged(object sender, MouseButtonEventArgs e) {
-			Rectangle rect = sender as Rectangle;
+			var rect = sender as Rectangle;
 			rect.TryInvoke(
 				() => {
 					string tag = rect.Tag.ToString();
@@ -171,9 +175,9 @@ namespace zongPanel.Forms {
 		}
 
 		private void AlphaChanged(object sender, SelectionChangedEventArgs e) {
-			ComboBox comboBox = sender as ComboBox;
-			string tag = string.Empty;
-			int idx = 0;
+			var comboBox = sender as ComboBox;
+			var tag = string.Empty;
+			var idx = 0;
 			comboBox.TryInvoke(
 				() => {
 					tag = comboBox.Tag.ToString();
@@ -184,17 +188,17 @@ namespace zongPanel.Forms {
 		}
 
 		private void UsageDockChanged(object sender, SelectionChangedEventArgs e) {
-			ComboBox comboBox = sender as ComboBox;
-			int idx = comboBox.TryInvoke(() => comboBox.SelectedIndex);
+			var comboBox = sender as ComboBox;
+			var idx = comboBox.TryInvoke(() => comboBox.SelectedIndex);
 			mCopiedConfig.ChangeUsageDock(idx);
 		}
 
-		private void imgSave_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+		private void SaveClicked(object sender, MouseButtonEventArgs e) {
 			mSaved = true;
 			rConfig = mCopiedConfig.Clone();
 		}
 
-		private void imgExit_MouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+		private void ExitClicked(object sender, MouseButtonEventArgs e) {
 			DialogResult = mSaved;
 			this.TryInvoke(() => this.Close());
 		}
