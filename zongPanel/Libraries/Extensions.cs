@@ -123,6 +123,27 @@ namespace zongPanel.Library {
 
 			return new System.Drawing.Font(fontFamily, emSize, fontStyle);
 		}
+
+		/// <summary>設定 Windows.Controls.Control 之對應的 Drawing.Font</summary>
+		/// <param name="ctrl">欲設定的 <see cref="Control"/></param>
+		/// <param name="font">欲更換的 <see cref="System.Drawing.Font"/></param>
+		public static void SetFont(this Control ctrl, System.Drawing.Font font) {
+			ctrl.FontFamily = new FontFamily(font.FontFamily.Name);
+			ctrl.FontSize = font.Size;
+			if (font.Style.HasFlag(System.Drawing.FontStyle.Bold)) ctrl.FontWeight = FontWeights.Bold;
+			if (font.Style.HasFlag(System.Drawing.FontStyle.Italic)) ctrl.FontStyle = FontStyles.Italic;
+		}
+
+		/// <summary>設定 Windows.Controls.Control 之對應的 Drawing.Font</summary>
+		/// <param name="ctrl">欲設定的 <see cref="Control"/></param>
+		/// <param name="font">欲更換的 <see cref="System.Drawing.Font"/></param>
+		/// <param name="size">指定要更換的字體大小</param>
+		public static void SetFont(this Control ctrl, System.Drawing.Font font, float size) {
+			ctrl.FontFamily = new FontFamily(font.FontFamily.Name);
+			ctrl.FontSize = size;
+			if (font.Style.HasFlag(System.Drawing.FontStyle.Bold)) ctrl.FontWeight = FontWeights.Bold;
+			if (font.Style.HasFlag(System.Drawing.FontStyle.Italic)) ctrl.FontStyle = FontStyles.Italic;
+		}
 		#endregion
 
 		#region Copies
