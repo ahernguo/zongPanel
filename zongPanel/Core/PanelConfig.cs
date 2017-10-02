@@ -370,8 +370,11 @@ namespace zongPanel {
 				}
 			}
 
-			if (clr != Color.Empty && mColors.ContainsKey(tag))
+			if (!clr.Equals(Color.Empty) && mColors.ContainsKey(tag)) {
 				mColors[tag] = clr;
+			} else if (clr.Equals(Color.Empty)) {
+				clr = oriColor.Clone();
+			}
 
 			return clr;
 		}
