@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -30,37 +31,20 @@ namespace zongPanel {
 		#endregion
 
 		#region Event Declare
-		/// <summary>時間變更事件，發報已套用格式之文字</summary>
-		public event TimeEventArgs TimeChanged;
-		/// <summary>日期變更事件，發報已套用格式之日期與星期</summary>
-		public event DateEventArgs DateChanged;
-		/// <summary>樣式變更事件，發報新的面板資訊設定檔</summary>
-		public event ConfigArgs StyleChanged; 
-		#endregion
-
-		#region Event Raiser
-		protected virtual void RaiseTimeChanged(DateTime time) {
-			if (TimeChanged != null) {
-				string timeStr = time.ToString("HH:mm");
-				TimeChanged.BeginInvoke(timeStr, null, null);
-			}
-		}
-
-		protected virtual void RaiseDateChanged(DateTime date) {
-			if (DateChanged != null) {
-				string dateStr = date.ToString("dd/MM/yyyy");
-
-				DateChanged.BeginInvoke(dateStr, "", null, null);
-			}
-		}
-
-		/// <summary>發報樣式變更事件。可直接帶入原始 instance，方法內會進行設定檔之複製</summary>
-		/// <param name="config">新的面板設定資訊</param>
-		protected virtual void RaiseStyleChanged(PanelConfig config) {
-			if (StyleChanged != null) {
-				StyleChanged.BeginInvoke(config.Clone(), null, null);
-			}
-		}
+		/// <summary>捷徑選項改變事件</summary>
+		public event EventHandler<ShortcutEventArgs> OnShortcutChanged;
+		/// <summary>顯示秒數改變事件</summary>
+		public event EventHandler<BoolEventArgs> OnShowSecondChanged;
+		/// <summary>數值改變事件</summary>
+		public event EventHandler<FormatEventArgs> OnFormatChanged;
+		/// <summary>字型改變事件</summary>
+		public event EventHandler<FontEventArgs> OnFontChanging;
+		/// <summary>顏色改變事件</summary>
+		public event EventHandler<ColorEventArgs> OnColorChanging;
+		/// <summary>效能面板停靠改變事件</summary>
+		public event EventHandler<DockEventArgs> OnDockChanged;
+		/// <summary>元件座標改變事件</summary>
+		public event EventHandler<PointEventArgs> OnPositionChanged;
 		#endregion
 
 		#region Constructors
@@ -117,25 +101,151 @@ namespace zongPanel {
 			/* 載入檔案 */
 			var config = PanelConfig.LoadFromFile(mPath["Config"]);
 			/* 如果檔案不存在，建立新檔 */
-			if (config == null) {
+			if (config is null) {
 				config = new PanelConfig();
 				config.SaveToFile(mPath["Config"]);
 			}
 			return config;
 		}
 
+		/// <summary>發布設定檔當前的設定</summary>
+		private void RaiseConfig() {
+			/* Colors & Fonts */
+			foreach (PanelComponent item in Enum.GetValues(typeof(PanelComponent))) {
+				if (mConfig.GetColor(item, out var color)) {
+					OnColorChanging?.Invoke(
+						this,
+						new ColorEventArgs(item, color)
+					);
+				}
+				if (mConfig.GetFont(item, out var font)) {
+					OnFontChanging?.Invoke(
+						this,
+						new FontEventArgs(item, font)
+					);
+				}
+				if (mConfig.GetPosition(item, out var point)) {
+					OnPositionChanged?.Invoke(
+						this,
+						new PointEventArgs(item, point)
+					);
+				}
+				if (mConfig.GetFormat(item, out var format)) {
+					OnFormatChanged?.Invoke(
+						this,
+						new FormatEventArgs(item, format)
+					);
+				}
+			}
+			/* Shortcut */
+			OnShortcutChanged?.Invoke(
+				this,
+				new ShortcutEventArgs(mConfig.Shortcuts)
+			);
+			/* Seconds */
+			OnShowSecondChanged?.Invoke(
+				this,
+				new BoolEventArgs(PanelComponent.Time, mConfig.ShowSecond)
+			);
+			/* Dock */
+			OnDockChanged?.Invoke(
+				this,
+				new DockEventArgs(mConfig.UsageDocking)
+			);
+		}
 		#endregion
 
 		#region Show Forms
 		/// <summary>顯示選項視窗</summary>
 		public void ShowOptionForm() {
-			var opFrm = new Option(mConfig);
-			//添加修改介面事件
+			/* 產生介面 */
+			var opFrm = new Option();
+			/* 添加事件處理 */
+			opFrm.OnAlphaChanged += AlphaChanged;
+			opFrm.OnColorChanging += ColorChanging;
+			opFrm.OnDockChanged += DockChanged;
+			opFrm.OnFontChanging += FontChanging;
+			opFrm.OnFormatChanged += FormatChanged;
+			opFrm.OnSaveTriggered += SaveConfigTriggered;
+			opFrm.OnShortcutChanged += ShortcutChanged;
+			opFrm.OnShowSecondChanged += ShowSecondChanged;
+			/* 顯示介面並等待關閉 */
 			var dlgRet = opFrm.ShowDialog();
-			if (dlgRet.HasValue && dlgRet.Value) {
-				mConfig.SaveToFile(mPath["Config"]);
-				RaiseStyleChanged(mConfig);
+			/* 重新載入設定檔 */
+			mConfig.Dispose();
+			mConfig = InitializeConfiguration();
+			/* 重新顯示 */
+			RaiseConfig();
+		}
+
+		/// <summary>透明程度更改事件處理，發布完整顏色至介面</summary>
+		/// <param name="sender"><see cref="Option"/> 視窗</param>
+		/// <param name="e">事件參數</param>
+		private void AlphaChanged(object sender, AlphaEventArgs e) {
+			var color = mConfig.ChangeAlpha(e.Component, e.Value);
+			OnColorChanging?.Invoke(this, new ColorEventArgs(e.Component, color));
+		}
+
+		/// <summary>背景或前景顏色更改事件處理，發布完整顏色至介面</summary>
+		/// <param name="sender"><see cref="Option"/> 視窗</param>
+		/// <param name="e">事件參數</param>
+		private void ColorChanging(object sender, ColorEventArgs e) {
+			mConfig.ChangeColor(e.Component, e.Value);
+			OnColorChanging?.Invoke(this, e);
+		}
+
+		/// <summary>停駐位置更改事件處理</summary>
+		/// <param name="sender"><see cref="Option"/> 視窗</param>
+		/// <param name="e">事件參數</param>
+		private void DockChanged(object sender, DockEventArgs e) {
+			mConfig.ChangeUsageDock(e.Dock);
+			OnDockChanged?.Invoke(this, e);
+		}
+
+		/// <summary>字型更改事件處理</summary>
+		/// <param name="sender"><see cref="Option"/> 視窗</param>
+		/// <param name="e">事件參數</param>
+		private void FontChanging(object sender, FontEventArgs e) {
+			mConfig.ChangeFont(e.Component, e.Value);
+			OnFontChanging?.Invoke(this, e);
+		}
+
+		/// <summary>格式內容更改事件處理</summary>
+		/// <param name="sender"><see cref="Option"/> 視窗</param>
+		/// <param name="e">事件參數</param>
+		private void FormatChanged(object sender, FormatNumberEventArgs e) {
+			Format format = null;
+			if (e.Component == PanelComponent.Date) {
+				format = mConfig.ChangeDateFormat(e.Value);
+			} else {
+				format = mConfig.ChangeWeekFormat(e.Value);
 			}
+			OnFormatChanged?.Invoke(this, new FormatEventArgs(e.Component, format));
+		}
+
+		/// <summary>使用者按下儲存設定檔事件處理</summary>
+		/// <param name="sender"><see cref="Option"/> 視窗</param>
+		/// <param name="e">事件參數</param>
+		private void SaveConfigTriggered(object sender, BoolEventArgs e) {
+			if (e.Value) {
+				mConfig.SaveToFile(mPath["Config"]);
+			}
+		}
+
+		/// <summary>捷徑選項更改事件處理</summary>
+		/// <param name="sender"><see cref="Option"/> 視窗</param>
+		/// <param name="e">事件參數</param>
+		private void ShortcutChanged(object sender, ShortcutVisibleEventArgs e) {
+			var shortcut = mConfig.ChangeShortcut(e.Shortcut, e.Visibility);
+			OnShortcutChanged?.Invoke(this, new ShortcutEventArgs(shortcut));
+		}
+
+		/// <summary>顯示秒數選項更改事件處理</summary>
+		/// <param name="sender"><see cref="Option"/> 視窗</param>
+		/// <param name="e">事件參數</param>
+		private void ShowSecondChanged(object sender, BoolEventArgs e) {
+			mConfig.ChangeShowSecond(e.Value);
+			OnShowSecondChanged?.Invoke(this, e);
 		}
 		#endregion
 	}

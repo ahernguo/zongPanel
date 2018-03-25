@@ -28,25 +28,36 @@ namespace zongPanel.Forms {
 		#endregion
 
 		#region Fields
-		/// <summary>由 <see cref="Window.Owner"/> 所帶入的面板設定資訊</summary>
-		private PanelConfig rConfig;
-		/// <summary>由 <see cref="Window.Owner"/> 所帶入的面板設定資訊複製品</summary>
-		private PanelConfig mCopiedConfig;
 		/// <summary>儲存資源檔圖片與其對應的 <see cref="ImageSource"/></summary>
 		private Dictionary<string, ImageSource> mResxImgSrc = new Dictionary<string, ImageSource>();
 		/// <summary>是否有按下儲存，需覆蓋原始設定資訊</summary>
 		private bool mSaved = false;
 		#endregion
 
+		#region Event Declarations
+		/// <summary>捷徑選項改變事件</summary>
+		public event EventHandler<ShortcutVisibleEventArgs> OnShortcutChanged;
+		/// <summary>顯示秒數改變事件</summary>
+		public event EventHandler<BoolEventArgs> OnShowSecondChanged;
+		/// <summary>數值改變事件</summary>
+		public event EventHandler<FormatNumberEventArgs> OnFormatChanged;
+		/// <summary>字型改變事件</summary>
+		public event EventHandler<FontEventArgs> OnFontChanging;
+		/// <summary>顏色改變事件</summary>
+		public event EventHandler<ColorEventArgs> OnColorChanging;
+		/// <summary>透明度改變事件</summary>
+		public event EventHandler<AlphaEventArgs> OnAlphaChanged;
+		/// <summary>效能面板停靠改變事件</summary>
+		public event EventHandler<DockEventArgs> OnDockChanged;
+		/// <summary>儲存設定事件</summary>
+		public event EventHandler<BoolEventArgs> OnSaveTriggered;
+		#endregion
+
 		#region Constructors
 		/// <summary>建立選項視窗，並帶入當前的面板設定資訊</summary>
-		/// <param name="config">目前的面板設定資訊，請帶入原始 instance，會於內部進行複製與修改</param>
-		public Option(PanelConfig config) {
+		/// <param name="config">目前的面板設定資訊，請帶入複製或可更改的 instance</param>
+		public Option() {
 			InitializeComponent();
-
-			/* 暫存至全域變數 */
-			rConfig = config;
-			mCopiedConfig = rConfig.Clone();
 
 			/* 讀取資源檔圖片並轉換為影像來源 */
 			InitializeImageSources();
@@ -88,25 +99,56 @@ namespace zongPanel.Forms {
 		private void LoadConfig(PanelConfig config) {
 			chkShowSec.IsChecked = config.ShowSecond;
 
-			chkCalc.IsChecked = config.Shortcuts.HasFlag(Shortcut.CALCULATOR);
-			chkNote.IsChecked = config.Shortcuts.HasFlag(Shortcut.NOTE);
-			chkRadio.IsChecked = config.Shortcuts.HasFlag(Shortcut.RADIO);
+			chkCalc.IsChecked = config.Shortcuts.HasFlag(Shortcut.Calculator);
+			chkNote.IsChecked = config.Shortcuts.HasFlag(Shortcut.Note);
+			chkRadio.IsChecked = config.Shortcuts.HasFlag(Shortcut.Radio);
 
-			cbDateAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.DateForeground);
-			cbNoteBgAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.NoteBackground);
-			cbNoteCntAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.NoteContentForeground);
-			cbNoteTitAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.NoteTitleForeground);
-			cbPnBgAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.PanelBackground);
-			cbTimeAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.TimeForeground);
-			cbUsgFontAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.UsageForeground);
-			cbWeekAlpha.SelectedIndex = CalculateAlphaToSelectedIndex(config.WeekForeground);
+			config.GetAlpha(PanelComponent.Date, out var alpha);
+			cbDateAlpha.SelectedIndex = alpha;
+			config.GetAlpha(PanelComponent.Note, out alpha);
+			cbNoteBgAlpha.SelectedIndex = alpha;
+			config.GetAlpha(PanelComponent.NoteContent, out alpha);
+			cbNoteCntAlpha.SelectedIndex = alpha;
+			config.GetAlpha(PanelComponent.NoteTitle, out alpha);
+			cbNoteTitAlpha.SelectedIndex = alpha;
+			config.GetAlpha(PanelComponent.Background, out alpha);
+			cbPnBgAlpha.SelectedIndex = alpha;
+			config.GetAlpha(PanelComponent.Time, out alpha);
+			cbTimeAlpha.SelectedIndex = alpha;
+			config.GetAlpha(PanelComponent.StatusBar, out alpha);
+			cbUsgFontAlpha.SelectedIndex = alpha;
+			config.GetAlpha(PanelComponent.Week, out alpha);
+			cbWeekAlpha.SelectedIndex = alpha;
 
-			btnDateFont.SetFont(config.DateFont, BTN_FONT_SIZE);
-			btnNoteCntFont.SetFont(config.NoteContentFont, BTN_FONT_SIZE);
-			btnNoteTitFont.SetFont(config.NoteTitleFont, BTN_FONT_SIZE);
-			btnTimeFont.SetFont(config.TimeFont, BTN_FONT_SIZE);
-			btnUsgFont.SetFont(config.UsageFont, BTN_FONT_SIZE);
-			btnWeekFont.SetFont(config.WeekFont, BTN_FONT_SIZE);
+			config.GetBrush(PanelComponent.Date, out var brush);
+			rectDateColor.Fill = brush;
+			config.GetBrush(PanelComponent.Note, out brush);
+			rectNoteBg.Fill = brush;
+			config.GetBrush(PanelComponent.NoteContent, out brush);
+			rectNoteCntColor.Fill = brush;
+			config.GetBrush(PanelComponent.NoteTitle, out brush);
+			rectNoteTitColor.Fill = brush;
+			config.GetBrush(PanelComponent.Background, out brush);
+			rectPnBg.Fill = brush;
+			config.GetBrush(PanelComponent.Time, out brush);
+			rectTimeColor.Fill = brush;
+			config.GetBrush(PanelComponent.StatusBar, out brush);
+			rectUsgFont.Fill = brush;
+			config.GetBrush(PanelComponent.Week, out brush);
+			rectWeekColor.Fill = brush;
+
+			config.GetFont(PanelComponent.Date, out var font);
+			btnDateFont.SetFont(font, BTN_FONT_SIZE);
+			config.GetFont(PanelComponent.NoteContent, out font);
+			btnNoteCntFont.SetFont(font, BTN_FONT_SIZE);
+			config.GetFont(PanelComponent.NoteTitle, out font);
+			btnNoteTitFont.SetFont(font, BTN_FONT_SIZE);
+			config.GetFont(PanelComponent.Time, out font);
+			btnTimeFont.SetFont(font, BTN_FONT_SIZE);
+			config.GetFont(PanelComponent.StatusBar, out font);
+			btnUsgFont.SetFont(font, BTN_FONT_SIZE);
+			config.GetFont(PanelComponent.Week, out font);
+			btnWeekFont.SetFont(font, BTN_FONT_SIZE);
 		}
 		#endregion
 
@@ -125,77 +167,122 @@ namespace zongPanel.Forms {
 
 		private void ShortcutChanged(object sender, RoutedEventArgs e) {
 			var chkBox = sender as CheckBox;
-			var tag = string.Empty;
+			var tag = Shortcut.Calculator;
 			var chk = false;
 			chkBox.TryInvoke(
 				() => {
-					tag = chkBox.Tag.ToString();
+					tag = (Shortcut)chkBox.Tag;
 					chk = chkBox.IsChecked.Value;
 				}
 			);
-			mCopiedConfig.ChangeShortcut(tag, chk);
+			OnShortcutChanged?.BeginInvoke(
+				this,
+				new ShortcutVisibleEventArgs(tag, chk),
+				null, null
+			);
 		}
 
 		private void ShowSecondChanged(object sender, RoutedEventArgs e) {
 			var chkBox = sender as CheckBox;
 			var chk = chkBox.TryInvoke(() => chkBox.IsChecked.Value);
-			mCopiedConfig.ChangeShowSecond(chk);
+			OnShowSecondChanged?.BeginInvoke(
+				this,
+				new BoolEventArgs(PanelComponent.Time, chk),
+				null, null
+			);
 		}
 
 		private void DateWeekFormatChanged(object sender, SelectionChangedEventArgs e) {
 			var comboBox = sender as ComboBox;
-			var tag = string.Empty;
+			var tag = PanelComponent.Week;
 			var idx = 0;
 			comboBox.TryInvoke(
 				() => {
-					tag = comboBox.Tag.ToString();
+					tag = (PanelComponent)comboBox.Tag;
 					idx = comboBox.SelectedIndex;
 				}
 			);
-			if ("Week".Equals(tag)) mCopiedConfig.ChangeWeekFormat(idx);
-			else if ("Date".Equals(tag)) mCopiedConfig.ChangeDateFormat(idx);
+			if (tag == PanelComponent.Week) {
+				OnFormatChanged?.BeginInvoke(
+					this,
+					new FormatNumberEventArgs(tag, idx),
+					null, null
+				);
+			}
 		}
 
 		private void FontClicked(object sender, RoutedEventArgs e) {
 			var btn = sender as Button;
-			var tag = btn.TryInvoke(() => btn.Tag.ToString());
-			var newFont = mCopiedConfig.ChangeFont(tag);
-			if (newFont != null) btn.TryInvoke(() => btn.SetFont(newFont, BTN_FONT_SIZE));
+			var tag = btn.TryInvoke(() => (PanelComponent)btn.Tag);
+
+			using (var diag = new System.Windows.Forms.FontDialog()) {
+				diag.ShowColor = false;
+				diag.ShowEffects = true;
+				diag.Font = btn.GetFont();
+				diag.FixedPitchOnly = false;
+				if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+					OnFontChanging?.Invoke( //跑同步，避免 Font 被刪掉
+						this,
+						new FontEventArgs(tag, diag.Font)
+					);
+					btn.SetFont(diag.Font, BTN_FONT_SIZE);
+				}
+			}
 		}
 
 		private void ColorChanged(object sender, MouseButtonEventArgs e) {
 			var rect = sender as Rectangle;
-			rect.TryInvoke(
-				() => {
-					string tag = rect.Tag.ToString();
-					Brush br = mCopiedConfig.ChangeColor(tag, rect.Fill.GetColor()).GetBrush();
-					rect.Fill = br;
+			var tag = rect.TryInvoke(() => (PanelComponent)rect.Tag);
+
+			using (var diag = new System.Windows.Forms.ColorDialog()) {
+				diag.AllowFullOpen = true;
+				diag.AnyColor = true;
+				diag.FullOpen = true;
+				diag.SolidColorOnly = true;
+				if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+					OnColorChanging?.Invoke(    //跑同步，避免 Font 被刪掉
+						this,
+						new ColorEventArgs(tag, diag.Color)
+					);
 				}
-			);
+				rect.TryInvoke(() => rect.Fill = diag.Color.GetBrush());
+			}
 		}
 
 		private void AlphaChanged(object sender, SelectionChangedEventArgs e) {
 			var comboBox = sender as ComboBox;
-			var tag = string.Empty;
+			var tag = PanelComponent.Background;
 			var idx = 0;
 			comboBox.TryInvoke(
 				() => {
-					tag = comboBox.Tag.ToString();
+					tag = (PanelComponent)comboBox.Tag;
 					idx = comboBox.SelectedIndex;
 				}
 			);
-			mCopiedConfig.ChangeAlpha(tag, idx);
+			OnAlphaChanged?.BeginInvoke(
+				this,
+				new AlphaEventArgs(tag, idx),
+				null, null
+			);
 		}
 
 		private void UsageDockChanged(object sender, SelectionChangedEventArgs e) {
 			var comboBox = sender as ComboBox;
 			var idx = comboBox.TryInvoke(() => comboBox.SelectedIndex);
-			mCopiedConfig.ChangeUsageDock(idx);
+			OnDockChanged?.BeginInvoke(
+				this,
+				new DockEventArgs((UsageDock)idx),
+				null, null
+			);
 		}
 
 		private void SaveClicked(object sender, MouseButtonEventArgs e) {
 			mSaved = true;
-			rConfig = mCopiedConfig.Clone();
+			OnSaveTriggered?.BeginInvoke(
+				this,
+				new BoolEventArgs(PanelComponent.Background, true),
+				null, null
+			);
 		}
 
 		private void ExitClicked(object sender, MouseButtonEventArgs e) {

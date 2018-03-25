@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -28,10 +29,16 @@ namespace zongPanel {
 		/// <summary>控制核心</summary>
 		private PanelCore mCore;
 		/// <summary>儲存資源檔圖片與其對應的 <see cref="ImageSource"/></summary>
-		private Dictionary<Image, ImageSource> mResxImgSrc = new Dictionary<Image, ImageSource>();
+		private Dictionary<System.Windows.Controls.Image, ImageSource> mResxImgSrc = new Dictionary<System.Windows.Controls.Image, ImageSource>();
 		/// <summary>儲存 <see cref="Image"/> 與其對應的 <see cref="Rect"/></summary>
 		/// <remarks>其中，<see cref="Rect"/> 為 X(Top)、Y(Left)、Width、Height</remarks>
-		private Dictionary<Image, Rect> mImgRect = new Dictionary<Image, Rect>();
+		private Dictionary<System.Windows.Controls.Image, Rect> mImgRect = new Dictionary<System.Windows.Controls.Image, Rect>();
+		/// <summary>日期格式</summary>
+		private Format mDateFormat;
+		/// <summary>星期格式</summary>
+		private Format mWeekFormat;
+		/// <summary>時間格式</summary>
+		private Format mTimeFormat;
 		#endregion
 
 		#region Constructors
@@ -41,6 +48,12 @@ namespace zongPanel {
 
 			/* 初始化核心 */
 			mCore = new PanelCore();
+			mCore.OnColorChanging += ColorChanging;
+			mCore.OnDockChanged += DockChanged;
+			mCore.OnFontChanging += FontChanging;
+			mCore.OnFormatChanged += FormatChanged;
+			mCore.OnShortcutChanged += ShortcutChanged;
+			mCore.OnShowSecondChanged += ShowSecondChanged;
 
 			/* 讀取資源檔圖片並轉換為影像來源 */
 			InitializeImageSources();
@@ -52,6 +65,40 @@ namespace zongPanel {
 		}
 		#endregion
 
+		#region PanelCore Event Handles
+		private void ColorChanging(object sender, ColorEventArgs e) {
+			ChangeColor(e.Component, e.Value);
+		}
+
+		private void DockChanged(object sender, DockEventArgs e) {
+			
+		}
+
+		private void FontChanging(object sender, FontEventArgs e) {
+			ChangeFont(e.Component, e.Value);
+		}
+
+		private void FormatChanged(object sender, FormatEventArgs e) {
+			if (e.Component == PanelComponent.Date) {
+				mDateFormat = e.Value;
+			} else {
+				mWeekFormat = e.Value;
+			}
+		}
+
+		private void ShortcutChanged(object sender, ShortcutEventArgs e) {
+			ChangeShortcut(e.Shortcut);
+		}
+
+		private void ShowSecondChanged(object sender, BoolEventArgs e) {
+			if (e.Value) {
+				mTimeFormat = new Format("HH:mm:ss", "en-US");
+			} else {
+				mTimeFormat = new Format("HH:mm", "en-US");
+			}
+		}
+		#endregion
+
 		#region Methods
 		/// <summary>載入資源檔圖片並轉換為 <see cref="ImageSource"/></summary>
 		private void InitializeImageSources() {
@@ -59,7 +106,7 @@ namespace zongPanel {
 			var rm = new ResourceManager("zongPanel.Properties.Resources", Assembly.GetExecutingAssembly());
 
 			/* 抓取 Images */
-			var imgColl = grid.Children.Cast<UIElement>().Where(ui => ui is Image).Cast<Image>();
+			var imgColl = grid.Children.Cast<UIElement>().Where(ui => ui is System.Windows.Controls.Image).Cast<System.Windows.Controls.Image>();
 			/* 利用 Image.Tag 去抓取對應的 Resource 圖片並加到 Dictionary 裡 */
 			foreach (var img in imgColl) {
 				var res = img.Tag.ToString();                           //Tag，應為 Resource 名稱
@@ -90,6 +137,118 @@ namespace zongPanel {
 				mImgRect.Add(kvp.Key, rect);
 			}
 		}
+
+		#region UI Changes
+		private void ChangeColor(PanelComponent component, System.Drawing.Color color) {
+			switch (component) {
+				case PanelComponent.Time:
+					lbTime.TryAsyncInvoke(
+						() => {
+							var brush = color.GetBrush();
+							lbTime.Foreground = brush;
+						}
+					);
+					break;
+				case PanelComponent.Date:
+					lbDate.TryAsyncInvoke(
+						() => {
+							var brush = color.GetBrush();
+							lbDate.Foreground = brush;
+						}
+					);
+					break;
+				case PanelComponent.Week:
+					lbWeek.TryAsyncInvoke(
+						() => {
+							var brush = color.GetBrush();
+							lbWeek.Foreground = brush;
+						}
+					);
+					break;
+				case PanelComponent.Background:
+					this.TryAsyncInvoke(
+						() => {
+							var brush = color.GetBrush();
+							this.Background = brush;
+						}
+					);
+					break;
+				case PanelComponent.StatusBar:
+					break;
+				default:
+					break;
+			}
+		}
+
+		private void ChangeFont(PanelComponent component, Font font) {
+			switch (component) {
+				case PanelComponent.Time:
+					lbTime.SetFont(font);
+					break;
+				case PanelComponent.Date:
+					lbDate.SetFont(font);
+					break;
+				case PanelComponent.Week:
+					lbWeek.SetFont(font);
+					break;
+				case PanelComponent.StatusBar:
+					break;
+				default:
+					break;
+			}
+		}
+
+		private void ChangePosition(PanelComponent component, PointF point) {
+			var margin = new Thickness(point.X, point.Y, 0, 0);
+			switch (component) {
+				case PanelComponent.Time:
+					lbTime.TryAsyncInvoke(() => lbTime.Margin = margin);
+					break;
+				case PanelComponent.Date:
+					lbDate.TryAsyncInvoke(() => lbDate.Margin = margin);
+					break;
+				case PanelComponent.Week:
+					lbWeek.TryAsyncInvoke(() => lbWeek.Margin = margin);
+					break;
+				case PanelComponent.Background:
+					this.TryAsyncInvoke(() => this.Margin = margin);
+					break;
+				default:
+					break;
+			}
+		}
+
+		private void ChangeShortcut(Shortcut shortcut) {
+			var left = 10.0;
+			if (shortcut.HasFlag(Shortcut.Note)) {
+				imgNote.TryInvoke(
+					() => {
+						var margin = new Thickness(left, 10, 0, 0);
+						imgNote.Margin = margin;
+						left += (imgNote.Width + 5);
+					}
+				);
+			}
+			if (shortcut.HasFlag(Shortcut.Radio)) {
+				imgRadio.TryInvoke(
+					() => {
+						var margin = new Thickness(left, 10, 0, 0);
+						imgRadio.Margin = margin;
+						left += (imgRadio.Width + 5);
+					}
+				);
+			}
+			if (shortcut.HasFlag(Shortcut.Calculator)) {
+				imgCalc.TryInvoke(
+					() => {
+						var margin = new Thickness(left, 10, 0, 0);
+						imgCalc.Margin = margin;
+					}
+				);
+			}
+		}
+		#endregion
+
 		#endregion
 
 		#region UI Events

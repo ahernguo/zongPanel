@@ -20,13 +20,13 @@ namespace zongPanel {
 	public enum UsageDock {
 		/// <summary>不顯示效能監視面板，隱藏</summary>
 		[EnumMember]
-		HIDDEN = 0,
+		Hidden = 0x00,
 		/// <summary>停靠於主面板上方</summary>
 		[EnumMember]
-		UP = 1,
+		Up = 0x01,
 		/// <summary>停靠於主面板下方</summary>
 		[EnumMember]
-		DOWN = 2
+		Down = 0x02
 	}
 
 	/// <summary>主面板之功能</summary>
@@ -35,13 +35,49 @@ namespace zongPanel {
 	public enum Shortcut {
 		/// <summary>便利貼</summary>
 		[EnumMember]
-		NOTE = 1,
+		Note = 0x01,
 		/// <summary>網路收音機</summary>
 		[EnumMember]
-		RADIO = 2,
+		Radio = 0x02,
 		/// <summary>小算盤捷徑</summary>
 		[EnumMember]
-		CALCULATOR = 4
+		Calculator = 0x04
+	}
+
+	/// <summary>面板元件</summary>
+	[DataContract]
+	[Flags]
+	public enum PanelComponent {
+		/// <summary>時間</summary>
+		[EnumMember]
+		Time = 0x0001,
+		/// <summary>日期</summary>
+		[EnumMember]
+		Date = 0x0002,
+		/// <summary>星期</summary>
+		[EnumMember]
+		Week = 0x0004,
+		/// <summary>主面板</summary>
+		[EnumMember]
+		Background = 0x0008,
+		/// <summary>便利貼</summary>
+		[EnumMember]
+		Note = 0x0010,
+		/// <summary>收音機</summary>
+		[EnumMember]
+		Radio = 0x0020,
+		/// <summary>計算機</summary>
+		[EnumMember]
+		Calculator = 0x0040,
+		/// <summary>狀態列</summary>
+		[EnumMember]
+		StatusBar = 0x0080,
+		/// <summary>便利貼之標題</summary>
+		[EnumMember]
+		NoteTitle = 0x0100,
+		/// <summary>便利貼之內容</summary>
+		[EnumMember]
+		NoteContent = 0x0200
 	}
 	#endregion
 
@@ -108,11 +144,12 @@ namespace zongPanel {
 	[KnownType(typeof(FontStyle))]
 	[KnownType(typeof(Format))]
 	[KnownType(typeof(GraphicsUnit))]
+	[KnownType(typeof(PanelComponent))]
 	[KnownType(typeof(PointF))]
 	[KnownType(typeof(RectangleF))]
 	[KnownType(typeof(Shortcut))]
 	[KnownType(typeof(SizeF))]
-	public class PanelConfig {
+	public class PanelConfig : IDisposable {
 
 		#region Fields
 		/// <summary>主面板大小與其位置</summary>
@@ -134,16 +171,16 @@ namespace zongPanel {
 
 		/// <summary>各個 <see cref="Label"/> 位置</summary>
 		[DataMember(Name = "Positions")]
-		private Dictionary<string, PointF> mPositions;
+		private Dictionary<PanelComponent, PointF> mPositions;
 		/// <summary>各 <see cref="Label"/> 所使用的 <see cref="Font"/></summary>
 		[DataMember(Name = "FontStyles")]
-		private Dictionary<string, Font> mFonts;
+		private Dictionary<PanelComponent, Font> mFonts;
 		/// <summary>主面板、便利貼與其他控制項所顯示的前景或背景顏色</summary>
 		[DataMember(Name = "ColorStyles")]
-		private Dictionary<string, Color> mColors;
+		private Dictionary<PanelComponent, Color> mColors;
 		/// <summary>日期與星期格式</summary>
 		[DataMember(Name = "DateWeekFormat")]
-		private Dictionary<string, Format> mFormats;
+		private Dictionary<PanelComponent, Format> mFormats;
 		#endregion
 
 		#region Properties
@@ -157,44 +194,6 @@ namespace zongPanel {
 		public Shortcut Shortcuts { get { return mShortcut; } }
 		/// <summary>取得是否顯示秒數</summary>
 		public bool ShowSecond { get { return mShowSec; } }
-		/// <summary>取得日期標籤位置</summary>
-		public PointF DatePosition { get { return mPositions.ContainsKey("Date") ? mPositions["Date"].Clone() : PointF.Empty; } }
-		/// <summary>取得星期標籤位置</summary>
-		public PointF WeekPosition { get { return mPositions.ContainsKey("Week") ? mPositions["Week"].Clone() : PointF.Empty; } }
-		/// <summary>取得時間標籤位置</summary>
-		public PointF TimePosition { get { return mPositions.ContainsKey("Time") ? mPositions["Time"].Clone() : PointF.Empty; } }
-		/// <summary>取得日期標籤字體</summary>
-		public Font DateFont { get { return mFonts.ContainsKey("Date") ? mFonts["Date"].Copy() : null; } }
-		/// <summary>取得星期標籤字體</summary>
-		public Font WeekFont { get { return mFonts.ContainsKey("Week") ? mFonts["Week"].Copy() : null; } }
-		/// <summary>取得時間標籤字體</summary>
-		public Font TimeFont { get { return mFonts.ContainsKey("Time") ? mFonts["Time"].Copy() : null; } }
-		/// <summary>取得便利貼標題字體</summary>
-		public Font NoteTitleFont { get { return mFonts.ContainsKey("Title") ? mFonts["Title"].Copy() : null; } }
-		/// <summary>取得便利貼內容字體</summary>
-		public Font NoteContentFont { get { return mFonts.ContainsKey("Content") ? mFonts["Content"].Copy() : null; } }
-		/// <summary>取得效能監視字體</summary>
-		public Font UsageFont { get { return mFonts.ContainsKey("Usage") ? mFonts["Usage"].Copy() : null; } }
-		/// <summary>取得主面板背景顏色</summary>
-		public Color PanelBackground { get { return mColors.ContainsKey("PanelBg") ? mColors["PanelBg"].Clone() : Color.Empty; } }
-		/// <summary>取得便利貼背景顏色</summary>
-		public Color NoteBackground { get { return mColors.ContainsKey("NoteBg") ? mColors["NoteBg"].Clone() : Color.Empty; } }
-		/// <summary>取得日期標籤文字顏色</summary>
-		public Color DateForeground { get { return mColors.ContainsKey("DateFg") ? mColors["DateFg"].Clone() : Color.Empty; } }
-		/// <summary>取得星期標籤文字顏色</summary>
-		public Color WeekForeground { get { return mColors.ContainsKey("WeekFg") ? mColors["WeekFg"].Clone() : Color.Empty; } }
-		/// <summary>取得時間標籤文字顏色</summary>
-		public Color TimeForeground { get { return mColors.ContainsKey("TimeFg") ? mColors["TimeFg"].Clone() : Color.Empty; } }
-		/// <summary>取得便利貼標題文字顏色</summary>
-		public Color NoteTitleForeground { get { return mColors.ContainsKey("NoteTitFg") ? mColors["NoteTitFg"].Clone() : Color.Empty; } }
-		/// <summary>取得便利貼內容文字顏色</summary>
-		public Color NoteContentForeground { get { return mColors.ContainsKey("NoteCntFg") ? mColors["NoteCntFg"].Clone() : Color.Empty; } }
-		/// <summary>取得效能監視文字顏色</summary>
-		public Color UsageForeground { get { return mColors.ContainsKey("UsageFg") ? mColors["UsageFg"].Clone() : Color.Empty; } }
-		/// <summary>取得日期於 <see cref="DateTime.ToString"/> 之相關格式</summary>
-		public Format DateFormat { get { return mFormats.ContainsKey("Date") ? mFormats["Date"].Clone() : null; } }
-		/// <summary>取得星期於 <see cref="DateTime.ToString"/> 之相關格式</summary>
-		public Format WeekFormat { get { return mFormats.ContainsKey("Week") ? mFormats["Week"].Clone() : null; } }
 		#endregion
 
 		#region Constructors
@@ -206,36 +205,45 @@ namespace zongPanel {
 			mWindRect = new RectangleF(x, y, 385, 245);
 
 			mNoteSize = new SizeF(300, 250);
-			mEffcDock = UsageDock.UP;
-			mShortcut = Shortcut.CALCULATOR | Shortcut.NOTE | Shortcut.RADIO;
+			mEffcDock = UsageDock.Up;
+			mShortcut = Shortcut.Calculator | Shortcut.Note | Shortcut.Radio;
 			mShowSec = false;
 
-			mPositions = new Dictionary<string, PointF> {
-				{ "Date",  new PointF(65, 65) }, { "Week",  new PointF(280, 65) }, { "Time",  new PointF(20, 120) }
+			mPositions = new Dictionary<PanelComponent, PointF> {
+				{ PanelComponent.Date, new PointF(65, 65) },
+				{ PanelComponent.Week, new PointF(280, 65) },
+				{ PanelComponent.Time, new PointF(20, 120) }
 			};
 
-			mFonts = new Dictionary<string, Font> {
-				{ "Date", new Font("Consolas", 24) }, { "Week", new Font("Consolas", 24) },
-				{ "Time", new Font("Consolas", 72) }, { "Title", new Font("微軟正黑體", 12) },
-				{ "Content", new Font("微軟正黑體", 12) }, { "Usage", new Font("Agency FB", 12, FontStyle.Bold) }
+			mFonts = new Dictionary<PanelComponent, Font> {
+				{ PanelComponent.Date, new Font("Consolas", 24) },
+				{ PanelComponent.Week, new Font("Consolas", 24) },
+				{ PanelComponent.Time, new Font("Consolas", 72) },
+				{ PanelComponent.NoteTitle, new Font("微軟正黑體", 12) },
+				{ PanelComponent.NoteContent, new Font("微軟正黑體", 12) },
+				{ PanelComponent.StatusBar, new Font("Agency FB", 12, FontStyle.Bold) }
 			};
 
-			mColors = new Dictionary<string, Color> {
-				{ "PanelBg", Color.FromArgb(154, 200, 200, 200) }, { "NoteBg", Color.FromArgb(154, 200, 200, 200) },
-				{ "DateFg", Color.FromArgb(230, 0, 0, 0) }, { "WeekFg", Color.FromArgb(230, 0, 0, 0) },
-				{ "TimeFg", Color.FromArgb(230, 0, 0, 0) }, { "NoteTitFg", Color.Black },
-				{ "NoteCntFg", Color.Black }, { "UsageFg",  Color.FromArgb(230, 0, 0, 0) }
+			mColors = new Dictionary<PanelComponent, Color> {
+				{ PanelComponent.Background, Color.FromArgb(154, 200, 200, 200) },
+				{ PanelComponent.Note, Color.FromArgb(154, 200, 200, 200) },
+				{ PanelComponent.Date, Color.FromArgb(230, 0, 0, 0) },
+				{ PanelComponent.Week, Color.FromArgb(230, 0, 0, 0) },
+				{ PanelComponent.Time, Color.FromArgb(230, 0, 0, 0) },
+				{ PanelComponent.NoteTitle, Color.Black },
+				{ PanelComponent.NoteContent, Color.Black },
+				{ PanelComponent.StatusBar, Color.FromArgb(230, 0, 0, 0) }
 			};
 
-			mFormats = new Dictionary<string, Format> {
-				{ "Date", new Format(@"yyyy 年 MM 月 dd 日", "zh-TW") },
-				{ "Week", new Format(@"dddd", "zh-TW") }
+			mFormats = new Dictionary<PanelComponent, Format> {
+				{ PanelComponent.Date, new Format(@"yyyy 年 MM 月 dd 日", "zh-TW") },
+				{ PanelComponent.Week, new Format(@"dddd", "zh-TW") }
 			};
 
 		}
 		#endregion
 
-		#region Public Operations
+		#region Other Operations
 		/// <summary>取得此設定檔之複製品，深層複製</summary>
 		public PanelConfig Clone() {
 			PanelConfig copied = null;
@@ -250,14 +258,40 @@ namespace zongPanel {
 			return copied;
 		}
 
-		/// <summary>設定小功能捷徑啟用狀態</summary>
-		/// <param name="tag">功能名稱，對應 <see cref="Shortcut"/></param>
-		/// <param name="chk">(<see cref="true"/>)啟用  (<see cref="false"/>)禁用</param>
-		public void ChangeShortcut(string tag, bool chk) {
-			var shortcut = (Shortcut)Enum.Parse(typeof(Shortcut), tag);
+		/// <summary>將目前的設定資訊匯出至文件，文件為 DataContract 序列化檔案</summary>
+		/// <param name="path">欲儲存的路徑，如 @"D:\config.xml"</param>
+		public void SaveToFile(string path) {
+			var setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
+			using (var xw = XmlWriter.Create(path, setting)) {
+				var contSer = new DataContractSerializer(typeof(PanelConfig));
+				contSer.WriteObject(xw, this);
+			}
+		}
 
+		/// <summary>載入已儲存的 DataContract 序列化檔案</summary>
+		/// <param name="path">儲存的檔案路徑，如 @"D:\config.xml"</param>
+		/// <returns>已載入的 <see cref="PanelConfig"/>，若檔案不存在則回傳 <see langword="null"/></returns>
+		public static PanelConfig LoadFromFile(string path) {
+			PanelConfig config = null;
+			if (File.Exists(path)) {
+				using (var xr = XmlReader.Create(path)) {
+					var contSer = new DataContractSerializer(typeof(PanelConfig));
+					config = contSer.ReadObject(xr) as PanelConfig;
+				}
+			}
+			return config;
+		}
+
+		#endregion
+
+		#region Changes
+		/// <summary>設定小功能捷徑啟用狀態</summary>
+		/// <param name="shortcut">欲更改的 <see cref="Shortcut"/></param>
+		/// <param name="chk">(<see cref="true"/>)啟用  (<see cref="false"/>)禁用</param>
+		public Shortcut ChangeShortcut(Shortcut shortcut, bool chk) {
 			if (chk) mShortcut |= shortcut;
 			else mShortcut &= ~shortcut;
+			return mShortcut;
 		}
 
 		/// <summary>設定顯示秒數功能</summary>
@@ -268,8 +302,9 @@ namespace zongPanel {
 
 		/// <summary>設定星期顯示格式</summary>
 		/// <param name="idx">樣式代碼</param>
+		/// <returns>新的格式物件執行個體，可直接 Assign</returns>
 		/// <remarks>目前是直接寫死，請注意參照!</remarks>
-		public void ChangeWeekFormat(int idx) {
+		public Format ChangeWeekFormat(int idx) {
 			var fmt = string.Empty;
 			var cult = string.Empty;
 			switch (idx) {
@@ -288,14 +323,15 @@ namespace zongPanel {
 					break;
 			}
 
-			if (mFormats.ContainsKey("Week"))
-				mFormats["Week"] = new Format(fmt, cult);
+			mFormats[PanelComponent.Week] = new Format(fmt, cult);
+			return new Format(fmt, cult);
 		}
 
 		/// <summary>設定日期顯示格式</summary>
 		/// <param name="idx">樣式代碼</param>
+		/// <returns>新的格式物件執行個體，可直接 Assign</returns>
 		/// <remarks>目前是直接寫死，請注意參照!</remarks>
-		public void ChangeDateFormat(int idx) {
+		public Format ChangeDateFormat(int idx) {
 			var fmt = string.Empty;
 			var cult = string.Empty;
 			switch (idx) {
@@ -332,93 +368,161 @@ namespace zongPanel {
 					break;
 			}
 
-			if (mFormats.ContainsKey("Date"))
-				mFormats["Date"] = new Format(fmt, cult);
+			mFormats[PanelComponent.Date] = new Format(fmt, cult);
+			return new Format(fmt, cult);
 		}
 
-		/// <summary>設定字體樣式，調用 <see cref="FontDialog"/> 供使用者選取</summary>
-		/// <param name="tag">欲設定的控制項名稱</param>
-		/// <remarks>目前採用 Tag 方式，請注意參照建構元的預設名稱</remarks>
-		public Font ChangeFont(string tag) {
-			Font font = null;
-			using (var dialog = new FontDialog()) {
-				if (mFonts[tag] != null) dialog.Font = mFonts[tag].Clone() as Font;
-				if (dialog.ShowDialog() == DialogResult.OK) {
-					font = dialog.Font.Clone() as Font;
-				}
+		/// <summary>設定字體樣式</summary>
+		/// <param name="component">欲更改的元件</param>
+		/// <param name="font">欲設定的新字體</param>
+		public void ChangeFont(PanelComponent component, Font font) {
+			if (mFonts.ContainsKey(component)) {
+				var oldFont = mFonts[component];
+				mFonts[component] = font.Copy();
+				oldFont?.Dispose();
 			}
-
-			if (font != null && mFonts.ContainsKey(tag))
-				mFonts[tag] = font;
-
-			return font;
 		}
 
-		/// <summary>設定相關顏色，調用 <see cref="ColorDialog"/> 供使用者選取</summary>
-		/// <param name="tag">欲設定的控制項名稱</param>
-		/// <param name="oriColor">當前顯示的顏色</param>
-		/// <remarks>目前採用 Tag 方式，請注意參照建構元的預設名稱</remarks>
-		public Color ChangeColor(string tag, Color oriColor) {
-			var clr = Color.Empty;
-			using (var dialog = new ColorDialog()) {
-				dialog.AllowFullOpen = true;
-				dialog.AnyColor = true;
-				dialog.FullOpen = true;
-				dialog.Color = oriColor;
-				if (dialog.ShowDialog() == DialogResult.OK) {
-					clr = Color.FromArgb(dialog.Color.A, dialog.Color.R, dialog.Color.G, dialog.Color.B);
-				}
+		/// <summary>設定相關顏色</summary>
+		/// <param name="component">欲更改的元件</param>
+		/// <param name="color">欲設定的新顏色</param>
+		public void ChangeColor(PanelComponent component, Color color) {
+			if (mColors.ContainsKey(component)) {
+				mColors[component] = color.Clone();
 			}
-
-			if (!clr.Equals(Color.Empty) && mColors.ContainsKey(tag)) {
-				mColors[tag] = clr;
-			} else if (clr.Equals(Color.Empty)) {
-				clr = oriColor.Clone();
-			}
-
-			return clr;
 		}
 
 		/// <summary>設定相關顏色透明度</summary>
-		/// <param name="tag">欲設定的控制項名稱</param>
+		/// <param name="component">欲更改的元件名稱</param>
 		/// <param name="idx">0 ~ 9 等級，分別對應 10% ~ 100%</param>
-		/// <remarks>目前採用 Tag 方式，請注意參照建構元的預設名稱</remarks>
-		public void ChangeAlpha(string tag, int idx) {
-			if (mColors.ContainsKey(tag)) {
-				int alpha = ((idx + 1) / 10) * 255;
-				Color oriClr = mColors[tag];
-				mColors[tag] = Color.FromArgb(alpha, oriClr);
+		/// <returns>最後產生的新顏色</returns>
+		public Color ChangeAlpha(PanelComponent component, int idx) {
+			var color = Color.Empty;
+			if (mColors.ContainsKey(component)) {
+				var alpha = (int)Math.Ceiling(((idx + 1) / 10F) * 255);
+				var oriClr = mColors[component];
+				color = Color.FromArgb(alpha, oriClr);
+				mColors[component] = color;
 			}
+			return color;
 		}
 
 		/// <summary>設定效能監視停靠點</summary>
 		/// <param name="idx">對應 <see cref="UsageDock"/> 的數值</param>
-		public void ChangeUsageDock(int idx) {
-			mEffcDock = (UsageDock)idx;
+		public void ChangeUsageDock(UsageDock idx) {
+			mEffcDock = idx;
+		}
+		#endregion
+
+		#region Gets
+		/// <summary>取得元件之座標</summary>
+		/// <param name="component">欲取得座標的面板元件</param>
+		/// <param name="point">目前設定檔所儲存的座標</param>
+		/// <returns>(True)成功取得 (False)取得失敗</returns>
+		public bool GetPosition(PanelComponent component, out PointF point) {
+			var exist = mPositions.ContainsKey(component);
+			point = exist ? mPositions[component].Clone() : PointF.Empty;
+			return exist;
 		}
 
-		/// <summary>將目前的設定資訊匯出至文件，文件為 DataContract 序列化檔案</summary>
-		/// <param name="path">欲儲存的路徑，如 @"D:\config.xml"</param>
-		public void SaveToFile(string path) {
-			var setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
-			using (var xw = XmlWriter.Create(path, setting)) {
-				var contSer = new DataContractSerializer(typeof(PanelConfig));
-				contSer.WriteObject(xw, this);
+		/// <summary>取得元件之字型</summary>
+		/// <param name="component">欲取得字型的面板元件</param>
+		/// <param name="font">目前設定檔所儲存的字型</param>
+		/// <returns>(True)成功取得 (False)取得失敗</returns>
+		public bool GetFont(PanelComponent component, out Font font) {
+			var exist = mFonts.ContainsKey(component);
+			font = exist ? mFonts[component].Copy() : null;
+			return exist;
+		}
+
+		/// <summary>取得元件之前景或背景顏色</summary>
+		/// <param name="component">欲取得顏色的面板元件</param>
+		/// <param name="color">目前設定檔所儲存的顏色</param>
+		/// <returns>(True)成功取得 (False)取得失敗</returns>
+		public bool GetColor(PanelComponent component, out Color color) {
+			var exist = mColors.ContainsKey(component);
+			color = exist ? mColors[component].Clone() : Color.Empty;
+			return exist;
+		}
+
+		/// <summary>取得元件之透明程度，以 0 ~ 9 代表 10% ~ 100%</summary>
+		/// <param name="component">欲取得透明程度的面板元件</param>
+		/// <param name="level">目前設定檔所儲存的透明程度</param>
+		/// <returns>(True)成功取得 (False)取得失敗</returns>
+		public bool GetAlpha(PanelComponent component, out int level) {
+			var exist = mColors.ContainsKey(component);
+			if (exist) {
+				var color = mColors[component];
+				var alpha = (color.A / 255) * 100;
+				var quotient = alpha / 10;
+				if ((alpha % 10) > 5) quotient++;
+				level = quotient - 1;
+			} else {
+				level = -1;
 			}
+			return exist;
 		}
 
-		/// <summary>載入已儲存的 DataContract 序列化檔案</summary>
-		/// <param name="path">儲存的檔案路徑，如 @"D:\config.xml"</param>
-		/// <returns>已載入的 <see cref="PanelConfig"/>，若檔案不存在則回傳 <see langword="null"/></returns>
-		public static PanelConfig LoadFromFile(string path) {
-			PanelConfig config = null;
-			if (File.Exists(path)) {
-				using (var xr = XmlReader.Create(path)) {
-					var contSer = new DataContractSerializer(typeof(PanelConfig));
-					config = contSer.ReadObject(xr) as PanelConfig;
+		/// <summary>取得元件之 <see cref="System.Windows.Media.Brush"/></summary>
+		/// <param name="component">欲取得 <see cref="System.Windows.Media.Brush"/> 的面板元件</param>
+		/// <param name="brush">目前設定檔所儲存的 <see cref="System.Windows.Media.Brush"/></param>
+		/// <returns>(True)成功取得 (False)取得失敗</returns>
+		public bool GetBrush(PanelComponent component, out System.Windows.Media.Brush brush) {
+			var exist = mColors.ContainsKey(component);
+			brush = exist ? mColors[component].GetBrush() : null;
+			return exist;
+		}
+
+		/// <summary>取得元件之格式內容</summary>
+		/// <param name="component">欲取得格式的面板元件</param>
+		/// <param name="format">目前設定檔所儲存的格式</param>
+		/// <returns>(True)成功取得 (False)取得失敗</returns>
+		public bool GetFormat(PanelComponent component, out Format format) {
+			var exist = mFormats.ContainsKey(component);
+			format = exist ? mFormats[component].Clone() : null;
+			return exist;
+		}
+		#endregion
+
+		#region IDisposable Support
+		private bool disposedValue = false; // 偵測多餘的呼叫
+
+		protected virtual void Dispose(bool disposing) {
+			if (!disposedValue) {
+				if (disposing) {
+					// TODO: 處置 Managed 狀態 (Managed 物件)。
+					foreach (var kvp in mFonts) {
+						kvp.Value.Dispose();
+					}
+
+					mPositions.Clear();
+					mFonts.Clear();
+					mColors.Clear();
+					mFormats.Clear();
 				}
+
+				// TODO: 釋放 Unmanaged 資源 (Unmanaged 物件) 並覆寫下方的完成項。
+				// TODO: 將大型欄位設為 null。
+				mPositions = null;
+				mFonts = null;
+				mColors = null;
+				mFormats = null;
+				disposedValue = true;
 			}
-			return config;
+		}
+
+		// TODO: 僅當上方的 Dispose(bool disposing) 具有會釋放 Unmanaged 資源的程式碼時，才覆寫完成項。
+		// ~PanelConfig() {
+		//   // 請勿變更這個程式碼。請將清除程式碼放入上方的 Dispose(bool disposing) 中。
+		//   Dispose(false);
+		// }
+
+		// 加入這個程式碼的目的在正確實作可處置的模式。
+		public void Dispose() {
+			// 請勿變更這個程式碼。請將清除程式碼放入上方的 Dispose(bool disposing) 中。
+			Dispose(true);
+			// TODO: 如果上方的完成項已被覆寫，即取消下行的註解狀態。
+			// GC.SuppressFinalize(this);
 		}
 		#endregion
 	}
