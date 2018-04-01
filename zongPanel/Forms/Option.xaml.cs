@@ -28,6 +28,8 @@ namespace zongPanel.Forms {
 		#endregion
 
 		#region Fields
+		/// <summary>主核心所帶入的可更改設定檔</summary>
+		private PanelConfig mConfig;
 		/// <summary>儲存資源檔圖片與其對應的 <see cref="ImageSource"/></summary>
 		private Dictionary<string, ImageSource> mResxImgSrc = new Dictionary<string, ImageSource>();
 		/// <summary>是否有按下儲存，需覆蓋原始設定資訊</summary>
@@ -36,31 +38,30 @@ namespace zongPanel.Forms {
 
 		#region Event Declarations
 		/// <summary>捷徑選項改變事件</summary>
-		public event EventHandler<ShortcutVisibleEventArgs> OnShortcutChanged;
+		public event EventHandler<ShortcutEventArgs> OnShortcutChanged;
 		/// <summary>顯示秒數改變事件</summary>
 		public event EventHandler<BoolEventArgs> OnShowSecondChanged;
 		/// <summary>數值改變事件</summary>
-		public event EventHandler<FormatNumberEventArgs> OnFormatChanged;
+		public event EventHandler<FormatEventArgs> OnFormatChanged;
 		/// <summary>字型改變事件</summary>
 		public event EventHandler<FontEventArgs> OnFontChanging;
 		/// <summary>顏色改變事件</summary>
 		public event EventHandler<ColorEventArgs> OnColorChanging;
-		/// <summary>透明度改變事件</summary>
-		public event EventHandler<AlphaEventArgs> OnAlphaChanged;
 		/// <summary>效能面板停靠改變事件</summary>
 		public event EventHandler<DockEventArgs> OnDockChanged;
-		/// <summary>儲存設定事件</summary>
-		public event EventHandler<BoolEventArgs> OnSaveTriggered;
 		#endregion
 
 		#region Constructors
 		/// <summary>建立選項視窗，並帶入當前的面板設定資訊</summary>
 		/// <param name="config">目前的面板設定資訊，請帶入複製或可更改的 instance</param>
-		public Option() {
+		public Option(PanelConfig config) {
 			InitializeComponent();
 
 			/* 讀取資源檔圖片並轉換為影像來源 */
 			InitializeImageSources();
+			/* 設定檔並還原當前的樣式 */
+			mConfig = config;
+			LoadConfig(config);
 		}
 		#endregion
 
@@ -166,6 +167,7 @@ namespace zongPanel.Forms {
 		}
 
 		private void ShortcutChanged(object sender, RoutedEventArgs e) {
+			mSaved = false;
 			var chkBox = sender as CheckBox;
 			var tag = Shortcut.Calculator;
 			var chk = false;
@@ -175,16 +177,19 @@ namespace zongPanel.Forms {
 					chk = chkBox.IsChecked.Value;
 				}
 			);
+			var scut = mConfig.ChangeShortcut(tag, chk);
 			OnShortcutChanged?.BeginInvoke(
 				this,
-				new ShortcutVisibleEventArgs(tag, chk),
+				new ShortcutEventArgs(scut),
 				null, null
 			);
 		}
 
 		private void ShowSecondChanged(object sender, RoutedEventArgs e) {
+			mSaved = false;
 			var chkBox = sender as CheckBox;
 			var chk = chkBox.TryInvoke(() => chkBox.IsChecked.Value);
+			mConfig.ChangeShowSecond(chk);
 			OnShowSecondChanged?.BeginInvoke(
 				this,
 				new BoolEventArgs(PanelComponent.Time, chk),
@@ -193,6 +198,8 @@ namespace zongPanel.Forms {
 		}
 
 		private void DateWeekFormatChanged(object sender, SelectionChangedEventArgs e) {
+			mSaved = false;
+			Format format = null;
 			var comboBox = sender as ComboBox;
 			var tag = PanelComponent.Week;
 			var idx = 0;
@@ -202,16 +209,22 @@ namespace zongPanel.Forms {
 					idx = comboBox.SelectedIndex;
 				}
 			);
-			if (tag == PanelComponent.Week) {
-				OnFormatChanged?.BeginInvoke(
-					this,
-					new FormatNumberEventArgs(tag, idx),
-					null, null
-				);
+
+			if (tag == PanelComponent.Date) {
+				format = mConfig.ChangeDateFormat(idx);
+			} else {
+				format = mConfig.ChangeWeekFormat(idx);
 			}
+
+			OnFormatChanged?.BeginInvoke(
+				this,
+				new FormatEventArgs(tag, format),
+				null, null
+			);
 		}
 
 		private void FontClicked(object sender, RoutedEventArgs e) {
+			mSaved = false;
 			var btn = sender as Button;
 			var tag = btn.TryInvoke(() => (PanelComponent)btn.Tag);
 
@@ -221,6 +234,7 @@ namespace zongPanel.Forms {
 				diag.Font = btn.GetFont();
 				diag.FixedPitchOnly = false;
 				if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+					mConfig.ChangeFont(tag, diag.Font);
 					OnFontChanging?.Invoke( //跑同步，避免 Font 被刪掉
 						this,
 						new FontEventArgs(tag, diag.Font)
@@ -231,6 +245,7 @@ namespace zongPanel.Forms {
 		}
 
 		private void ColorChanged(object sender, MouseButtonEventArgs e) {
+			mSaved = false;
 			var rect = sender as Rectangle;
 			var tag = rect.TryInvoke(() => (PanelComponent)rect.Tag);
 
@@ -240,7 +255,8 @@ namespace zongPanel.Forms {
 				diag.FullOpen = true;
 				diag.SolidColorOnly = true;
 				if (diag.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-					OnColorChanging?.Invoke(    //跑同步，避免 Font 被刪掉
+					mConfig.ChangeColor(tag, diag.Color);
+					OnColorChanging?.Invoke(
 						this,
 						new ColorEventArgs(tag, diag.Color)
 					);
@@ -250,6 +266,7 @@ namespace zongPanel.Forms {
 		}
 
 		private void AlphaChanged(object sender, SelectionChangedEventArgs e) {
+			mSaved = false;
 			var comboBox = sender as ComboBox;
 			var tag = PanelComponent.Background;
 			var idx = 0;
@@ -259,35 +276,37 @@ namespace zongPanel.Forms {
 					idx = comboBox.SelectedIndex;
 				}
 			);
-			OnAlphaChanged?.BeginInvoke(
+			var color = mConfig.ChangeAlpha(tag, idx);
+			OnColorChanging?.Invoke(
 				this,
-				new AlphaEventArgs(tag, idx),
-				null, null
+				new ColorEventArgs(tag, color)
 			);
 		}
 
 		private void UsageDockChanged(object sender, SelectionChangedEventArgs e) {
+			mSaved = false;
 			var comboBox = sender as ComboBox;
-			var idx = comboBox.TryInvoke(() => comboBox.SelectedIndex);
+			var idx = (UsageDock)comboBox.TryInvoke(() => comboBox.SelectedIndex);
+			mConfig.ChangeUsageDock(idx);
 			OnDockChanged?.BeginInvoke(
 				this,
-				new DockEventArgs((UsageDock)idx),
+				new DockEventArgs(idx),
 				null, null
 			);
 		}
 
 		private void SaveClicked(object sender, MouseButtonEventArgs e) {
 			mSaved = true;
-			OnSaveTriggered?.BeginInvoke(
-				this,
-				new BoolEventArgs(PanelComponent.Background, true),
-				null, null
-			);
+			mConfig.SaveToFile();
 		}
 
 		private void ExitClicked(object sender, MouseButtonEventArgs e) {
+			/* 清除記憶體 */
+			if (mConfig != null) {
+				mConfig.Dispose();
+			}
+			/* 如果有按過存檔則回傳 True，設定 DialogResult 後視窗將會自動關閉 */
 			DialogResult = mSaved;
-			this.TryInvoke(() => this.Close());
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {

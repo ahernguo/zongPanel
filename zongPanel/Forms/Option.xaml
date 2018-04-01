@@ -52,7 +52,7 @@
 								<ComboBoxItem Content="90"/>
 								<ComboBoxItem Content="100"/>
 							</ComboBox>
-							<ComboBox x:Name="cbWeekAlpha" HorizontalAlignment="Left" Margin="127,46,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="{x:Static local:PanelComponent.Date}">
+							<ComboBox x:Name="cbWeekAlpha" HorizontalAlignment="Left" Margin="127,46,0,0" VerticalAlignment="Top" Width="52" SelectedIndex="8" Tag="{x:Static local:PanelComponent.Date}">
 								<ComboBoxItem Content="10"/>
 								<ComboBoxItem Content="20"/>
 								<ComboBoxItem Content="30"/>
@@ -64,7 +64,7 @@
 								<ComboBoxItem Content="90"/>
 								<ComboBoxItem Content="100"/>
 							</ComboBox>
-							<ComboBox x:Name="cbDateAlpha" HorizontalAlignment="Left" Margin="127,84,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="{x:Static local:PanelComponent.Week}">
+							<ComboBox x:Name="cbDateAlpha" HorizontalAlignment="Left" Margin="127,84,0,0" VerticalAlignment="Top" Width="52" SelectedIndex="8" Tag="{x:Static local:PanelComponent.Week}">
 								<ComboBoxItem Content="10"/>
 								<ComboBoxItem Content="20"/>
 								<ComboBoxItem Content="30"/>
@@ -76,7 +76,7 @@
 								<ComboBoxItem Content="90"/>
 								<ComboBoxItem Content="100"/>
 							</ComboBox>
-							<ComboBox x:Name="cbTimeAlpha" HorizontalAlignment="Left" Margin="127,122,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="{x:Static local:PanelComponent.Time}">
+							<ComboBox x:Name="cbTimeAlpha" HorizontalAlignment="Left" Margin="127,122,0,0" VerticalAlignment="Top" Width="52" SelectedIndex="8" Tag="{x:Static local:PanelComponent.Time}">
 								<ComboBoxItem Content="10"/>
 								<ComboBoxItem Content="20"/>
 								<ComboBoxItem Content="30"/>
@@ -139,7 +139,7 @@
 						<ComboBoxItem Content="90"/>
 						<ComboBoxItem Content="100"/>
 					</ComboBox>
-					<ComboBox x:Name="cbNoteTitAlpha" HorizontalAlignment="Left" Margin="147,72,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="{x:Static local:PanelComponent.NoteTitle}">
+					<ComboBox x:Name="cbNoteTitAlpha" HorizontalAlignment="Left" Margin="147,72,0,0" VerticalAlignment="Top" Width="52" SelectedIndex="8" Tag="{x:Static local:PanelComponent.NoteTitle}">
 						<ComboBoxItem Content="10"/>
 						<ComboBoxItem Content="20"/>
 						<ComboBoxItem Content="30"/>
@@ -151,7 +151,7 @@
 						<ComboBoxItem Content="90"/>
 						<ComboBoxItem Content="100"/>
 					</ComboBox>
-					<ComboBox x:Name="cbNoteCntAlpha" HorizontalAlignment="Left" Margin="147,113,0,0" VerticalAlignment="Top" Width="47" SelectedIndex="8" Tag="{x:Static local:PanelComponent.NoteContent}">
+					<ComboBox x:Name="cbNoteCntAlpha" HorizontalAlignment="Left" Margin="147,113,0,0" VerticalAlignment="Top" Width="52" SelectedIndex="8" Tag="{x:Static local:PanelComponent.NoteContent}">
 						<ComboBoxItem Content="10"/>
 						<ComboBoxItem Content="20"/>
 						<ComboBoxItem Content="30"/>

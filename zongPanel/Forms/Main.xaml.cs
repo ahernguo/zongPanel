@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using zongPanel.Library;
+using zongPanel.Forms;
 
 namespace zongPanel {
 
@@ -48,12 +49,6 @@ namespace zongPanel {
 
 			/* 初始化核心 */
 			mCore = new PanelCore();
-			mCore.OnColorChanging += ColorChanging;
-			mCore.OnDockChanged += DockChanged;
-			mCore.OnFontChanging += FontChanging;
-			mCore.OnFormatChanged += FormatChanged;
-			mCore.OnShortcutChanged += ShortcutChanged;
-			mCore.OnShowSecondChanged += ShowSecondChanged;
 
 			/* 讀取資源檔圖片並轉換為影像來源 */
 			InitializeImageSources();
@@ -65,7 +60,7 @@ namespace zongPanel {
 		}
 		#endregion
 
-		#region PanelCore Event Handles
+		#region Option Window Event Handlers
 		private void ColorChanging(object sender, ColorEventArgs e) {
 			ChangeColor(e.Component, e.Value);
 		}
@@ -296,9 +291,20 @@ namespace zongPanel {
 
 		/// <summary>開啟選項視窗</summary>
 		private void OptionClicked(object sender, MouseButtonEventArgs e) {
-			mCore.ShowOptionForm();
+			/* 產生介面 */
+			var opFrm = mCore.CreateOptionWindow();
+			/* 添加事件處理 */
+			opFrm.OnColorChanging += ColorChanging;
+			opFrm.OnDockChanged += DockChanged;
+			opFrm.OnFontChanging += FontChanging;
+			opFrm.OnFormatChanged += FormatChanged;
+			opFrm.OnShortcutChanged += ShortcutChanged;
+			opFrm.OnShowSecondChanged += ShowSecondChanged;
+			/* 顯示介面並等待關閉 */
+			opFrm.ShowDialog();
+			/* 重新載入設定檔 */
+			mCore.ReloadConfig();
 		}
-
 		#endregion
 	}
 }

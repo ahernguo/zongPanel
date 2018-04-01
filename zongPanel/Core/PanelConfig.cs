@@ -79,6 +79,18 @@ namespace zongPanel {
 		[EnumMember]
 		NoteContent = 0x0200
 	}
+
+	/// <summary>路徑清單</summary>
+	public enum Paths {
+		/// <summary>主目錄</summary>
+		Main = 0x01,
+		/// <summary>設定檔</summary>
+		Config = 0x02,
+		/// <summary>便利貼來源</summary>
+		Note = 0x04,
+		/// <summary>記錄檔</summary>
+		Log = 0x08
+	}
 	#endregion
 
 	#region Global Support Classes
@@ -181,6 +193,9 @@ namespace zongPanel {
 		/// <summary>日期與星期格式</summary>
 		[DataMember(Name = "DateWeekFormat")]
 		private Dictionary<PanelComponent, Format> mFormats;
+
+		/// <summary>載入的設定檔路徑</summary>
+		private string mConfigFile = null;
 		#endregion
 
 		#region Properties
@@ -244,6 +259,12 @@ namespace zongPanel {
 		#endregion
 
 		#region Other Operations
+		/// <summary>設定設定檔路徑</summary>
+		/// <param name="path">檔案路徑</param>
+		private void SetConfigFile(string path) {
+			mConfigFile = path;
+		}
+
 		/// <summary>取得此設定檔之複製品，深層複製</summary>
 		public PanelConfig Clone() {
 			PanelConfig copied = null;
@@ -254,13 +275,26 @@ namespace zongPanel {
 				/* 從 MemoryStream 做反序列化，此即複製品 */
 				ms.Position = 0;
 				copied = contSer.ReadObject(ms) as PanelConfig;
+				if (!string.IsNullOrEmpty(mConfigFile) && copied != null) copied.SetConfigFile(mConfigFile);
 			}
 			return copied;
+		}
+
+		/// <summary>複寫當前的設定檔至原始載入的文件，為 DataContract 序列化檔案</summary>
+		public void SaveToFile() {
+			if (!string.IsNullOrEmpty(mConfigFile)) {
+				var setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
+				using (var xw = XmlWriter.Create(mConfigFile, setting)) {
+					var contSer = new DataContractSerializer(typeof(PanelConfig));
+					contSer.WriteObject(xw, this);
+				} 
+			}
 		}
 
 		/// <summary>將目前的設定資訊匯出至文件，文件為 DataContract 序列化檔案</summary>
 		/// <param name="path">欲儲存的路徑，如 @"D:\config.xml"</param>
 		public void SaveToFile(string path) {
+			mConfigFile = path;
 			var setting = new XmlWriterSettings() { Indent = true, IndentChars = "\t" };
 			using (var xw = XmlWriter.Create(path, setting)) {
 				var contSer = new DataContractSerializer(typeof(PanelConfig));
@@ -277,6 +311,7 @@ namespace zongPanel {
 				using (var xr = XmlReader.Create(path)) {
 					var contSer = new DataContractSerializer(typeof(PanelConfig));
 					config = contSer.ReadObject(xr) as PanelConfig;
+					if (config != null) config.SetConfigFile(path);
 				}
 			}
 			return config;
@@ -453,8 +488,8 @@ namespace zongPanel {
 			var exist = mColors.ContainsKey(component);
 			if (exist) {
 				var color = mColors[component];
-				var alpha = (color.A / 255) * 100;
-				var quotient = alpha / 10;
+				var alpha = (color.A / 255.0) * 100.0;
+				var quotient = (int)(alpha / 10);
 				if ((alpha % 10) > 5) quotient++;
 				level = quotient - 1;
 			} else {
