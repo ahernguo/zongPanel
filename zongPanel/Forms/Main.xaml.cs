@@ -40,6 +40,8 @@ namespace zongPanel {
 		private Format mWeekFormat;
 		/// <summary>時間格式</summary>
 		private Format mTimeFormat;
+		/// <summary>指出是否已經顯示過</summary>
+		private bool mShown = false;
 		#endregion
 
 		#region Constructors
@@ -49,6 +51,7 @@ namespace zongPanel {
 
 			/* 初始化核心 */
 			mCore = new PanelCore();
+			mCore.ConfigChanged += ConfigChanged;
 
 			/* 讀取資源檔圖片並轉換為影像來源 */
 			InitializeImageSources();
@@ -58,6 +61,54 @@ namespace zongPanel {
 			/* 添加滑鼠移動事件，移到 Image Bound 上時顯示之 */
 			this.MouseMove += MainWindow_MouseMove;
 		}
+		#endregion
+
+		#region PanelCore Event Handlers
+		/// <summary>設定檔變更處理，已採非同步觸發此事件，且設定檔為複製體</summary>
+		/// <param name="sender"><see cref="PanelConfig"/></param>
+		/// <param name="e">設定檔參數</param>
+		/// <remarks>
+		/// 有嘗試過使用 TryAsyncInvoke
+		/// 但因為 e.Config 在離開此括號後就刪了
+		/// 導致後續的非同步跑到的時候已經變成 null 而跳 Exception，所以這邊全採同步啦!
+		/// </remarks>
+		private void ConfigChanged(object sender, ConfigEventArgs e) {
+			/* 面板 */
+			this.TryInvoke(
+				() => {
+					if (e.Config.GetBrush(PanelComponent.Background, out var bg)) {
+						this.Background = bg;
+					}
+					if (e.Config.GetMargin(PanelComponent.Background, out var margin)) {
+						this.Margin = margin;
+					}
+					this.SetRectangle(e.Config.WindowRectangle);
+				}
+			);
+			/* 日期、星期、時間 */
+			var labels = new Dictionary<PanelComponent, Control> {
+				{ PanelComponent.Date, lbDate },
+				{ PanelComponent.Week, lbWeek },
+				{ PanelComponent.Time, lbTime }
+			};
+			foreach (var kvp in labels) {
+				kvp.Value.TryInvoke(
+					() => {
+						if (e.Config.GetBrush(kvp.Key, out var fg)) {
+							kvp.Value.Foreground = fg;
+						}
+						if (e.Config.GetFont(kvp.Key, out var font)) {
+							kvp.Value.SetFont(font);
+						}
+						if (e.Config.GetMargin(kvp.Key, out var margin)) {
+							kvp.Value.Margin = margin;
+						}
+					}
+				);
+			}
+			/* 捷徑 */
+			ChangeShortcut(e.Config.Shortcuts);
+		} 
 		#endregion
 
 		#region Option Window Event Handlers
@@ -304,6 +355,15 @@ namespace zongPanel {
 			opFrm.ShowDialog();
 			/* 重新載入設定檔 */
 			mCore.ReloadConfig();
+		}
+
+		protected override void OnContentRendered(EventArgs e) {
+			base.OnContentRendered(e);
+
+			if (!mShown) {
+				mCore.ThrowConfig();
+				mShown = true;
+			}
 		}
 		#endregion
 	}

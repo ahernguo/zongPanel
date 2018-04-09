@@ -25,9 +25,25 @@ namespace zongPanel {
 		private PanelConfig mConfig;
 		#endregion
 
-		#region Properties
-		/// <summary>取得面板相關文件路徑</summary>
-		public IReadOnlyDictionary<Paths, string> PanelPath => mPath;
+		#region Events
+		/// <summary>設定檔變更事件</summary>
+		public event EventHandler<ConfigEventArgs> ConfigChanged;
+
+		/// <summary>發布設定檔變更事件，直接抓取全域變數發布</summary>
+		private void RaiseConfChg() {
+			if (ConfigChanged != null) {
+				var config = mConfig.Clone();
+				ConfigChanged?.BeginInvoke(
+					this,
+					new ConfigEventArgs(config),
+					obj => {
+						config.Dispose();
+						config = null;
+					},
+					null
+				);
+			}
+		}
 		#endregion
 
 		#region Constructors
@@ -103,6 +119,7 @@ namespace zongPanel {
 		#endregion
 
 		#region Public Operations
+		/// <summary>重新載入設定檔</summary>
 		public void ReloadConfig() {
 			/* 先把當前的清除 */
 			if (mConfig != null) {
@@ -110,6 +127,13 @@ namespace zongPanel {
 			}
 			/* 重新載入 */
 			mConfig = InitializeConfiguration();
+			/* 重新發布設定檔 */
+			RaiseConfChg();
+		}
+
+		/// <summary>發布當前載入的設定檔</summary>
+		public void ThrowConfig() {
+			RaiseConfChg();
 		}
 		#endregion
 	}

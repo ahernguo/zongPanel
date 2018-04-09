@@ -152,6 +152,34 @@ namespace zongPanel.Library {
 				}
 			);
 		}
+
+		/// <summary>取得 System.Windows.Window 對應的 System.Drawing.RectangleF</summary>
+		/// <param name="window">欲取得的 <see cref="Window"/></param>
+		/// <returns>框體資訊</returns>
+		public static System.Drawing.RectangleF GetRectangle(this Window window) {
+			return window.TryInvoke(
+				() => new System.Drawing.RectangleF(
+					(float)window.Left,
+					(float)window.Top,
+					(float)window.Width,
+					(float)window.Height
+				)
+			);
+		}
+
+		/// <summary>將 System.Drawing.RectangleF 設定至對應的 System.Windows.Window</summary>
+		/// <param name="window">欲寫入的 <see cref="Window"/></param>
+		/// <param name="rect">欲設定的 <see cref="System.Drawing.RectangleF"/></param>
+		public static void SetRectangle(this Window window, System.Drawing.RectangleF rect) {
+			window.TryInvoke(
+				() => {
+					window.Left = rect.Left;
+					window.Top = rect.Top;
+					window.Width = rect.Width;
+					window.Height = rect.Height;
+				}
+			);
+		}
 		#endregion
 
 		#region Copies

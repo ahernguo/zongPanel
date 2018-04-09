@@ -181,10 +181,10 @@ namespace zongPanel {
 		[DataMember(Name = "ShowSecond")]
 		private bool mShowSec;
 
-		/// <summary>各個 <see cref="Label"/> 位置</summary>
+		/// <summary>元件座標位置</summary>
 		[DataMember(Name = "Positions")]
 		private Dictionary<PanelComponent, PointF> mPositions;
-		/// <summary>各 <see cref="Label"/> 所使用的 <see cref="Font"/></summary>
+		/// <summary>元件所使用的 <see cref="Font"/></summary>
 		[DataMember(Name = "FontStyles")]
 		private Dictionary<PanelComponent, Font> mFonts;
 		/// <summary>主面板、便利貼與其他控制項所顯示的前景或背景顏色</summary>
@@ -200,23 +200,23 @@ namespace zongPanel {
 
 		#region Properties
 		/// <summary>取得主面板位置與大小</summary>
-		public RectangleF WindowRectangle { get { return new RectangleF(mWindRect.X, mWindRect.Y, mWindRect.Width, mWindRect.Height); } }
+		public RectangleF WindowRectangle => new RectangleF(mWindRect.X, mWindRect.Y, mWindRect.Width, mWindRect.Height);
 		/// <summary>取得便利貼預設視窗大小</summary>
-		public SizeF NoteSize { get { return new SizeF(mNoteSize); } }
+		public SizeF NoteSize => new SizeF(mNoteSize);
 		/// <summary>取得效能監視停靠點</summary>
-		public UsageDock UsageDocking { get { return mEffcDock; } }
+		public UsageDock UsageDocking => mEffcDock;
 		/// <summary>取得啟用的小功能捷徑</summary>
-		public Shortcut Shortcuts { get { return mShortcut; } }
+		public Shortcut Shortcuts => mShortcut;
 		/// <summary>取得是否顯示秒數</summary>
-		public bool ShowSecond { get { return mShowSec; } }
+		public bool ShowSecond => mShowSec;
 		#endregion
 
 		#region Constructors
 		/// <summary>建立帶有預設值的設定資訊</summary>
 		public PanelConfig() {
 			var workRect = Screen.PrimaryScreen.WorkingArea;
-			float x = workRect.X + workRect.Right - 385;
-			float y = workRect.Y + workRect.Bottom - 245;
+			float x = (workRect.X + workRect.Right) / 2 - 385;
+			float y = (workRect.Y + workRect.Bottom) / 2 - 245;
 			mWindRect = new RectangleF(x, y, 385, 245);
 
 			mNoteSize = new SizeF(300, 250);
@@ -287,7 +287,7 @@ namespace zongPanel {
 				using (var xw = XmlWriter.Create(mConfigFile, setting)) {
 					var contSer = new DataContractSerializer(typeof(PanelConfig));
 					contSer.WriteObject(xw, this);
-				} 
+				}
 			}
 		}
 
@@ -454,9 +454,10 @@ namespace zongPanel {
 		/// <param name="component">欲取得座標的面板元件</param>
 		/// <param name="point">目前設定檔所儲存的座標</param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
-		public bool GetPosition(PanelComponent component, out PointF point) {
+		public bool GetMargin(PanelComponent component, out System.Windows.Thickness margin) {
 			var exist = mPositions.ContainsKey(component);
-			point = exist ? mPositions[component].Clone() : PointF.Empty;
+			var pt = exist ? mPositions[component] : PointF.Empty;
+			margin = new System.Windows.Thickness(pt.X, pt.Y, 0, 0);
 			return exist;
 		}
 
