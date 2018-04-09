@@ -79,9 +79,6 @@ namespace zongPanel {
 					if (e.Config.GetBrush(PanelComponent.Background, out var bg)) {
 						this.Background = bg;
 					}
-					if (e.Config.GetMargin(PanelComponent.Background, out var margin)) {
-						this.Margin = margin;
-					}
 					this.SetRectangle(e.Config.WindowRectangle);
 				}
 			);
