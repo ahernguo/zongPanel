@@ -17,7 +17,10 @@
 				<Grid x:Name="gridPanel" Background="#FFE5E5E5" Margin="0,1,0,-1">
 					<GroupBox x:Name="gbPanel" Header="主面板" HorizontalAlignment="Left" Height="120" Margin="10,10,0,0" VerticalAlignment="Top" Width="195" BorderBrush="#FFC8C8C8">
 						<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Margin="0,0,0,0">
-							<Button x:Name="btnUnlock" Content="解鎖面板" HorizontalAlignment="Left" Height="32" Margin="50,30,0,0" VerticalAlignment="Top" Width="81"/>
+							<Button x:Name="btnUnlock" Content="解鎖面板" HorizontalAlignment="Left" Height="32" Margin="50,30,0,0" VerticalAlignment="Top" Width="81"
+								Visibility="{Binding IsLocked, Converter={StaticResource Bol2Vis}}" Click="LockClicked"/>
+							<Button x:Name="btnLock" Content="鎖定面板" HorizontalAlignment="Left" Height="32" Margin="50,30,0,0" VerticalAlignment="Top" Width="81"
+								Visibility="{Binding IsLocked, Converter={StaticResource InvBol2Vis}}" Click="LockClicked"/>
 						</Grid>
 					</GroupBox>
 					<GroupBox x:Name="gbShortcut" Header="捷徑" HorizontalAlignment="Left" Margin="208,10,0,0" VerticalAlignment="Top" Height="120" Width="195" BorderBrush="#FFC8C8C8">

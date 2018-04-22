@@ -4,6 +4,9 @@
              xmlns:local="clr-namespace:zongPanel"
              StartupUri="Forms\Main.xaml">
     <Application.Resources>
-         
+		<ResourceDictionary>
+			<BooleanToVisibilityConverter x:Key="Bol2Vis"/>
+			<local:InverseBooleanToVisibilityConverter x:Key="InvBol2Vis"/>
+		</ResourceDictionary>
     </Application.Resources>
 </Application>

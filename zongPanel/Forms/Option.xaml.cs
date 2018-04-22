@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,7 +22,7 @@ namespace zongPanel.Forms {
 	/// <summary>
 	/// Option.xaml 的互動邏輯
 	/// </summary>
-	public partial class Option : Window {
+	public partial class Option : Window, INotifyPropertyChanged {
 
 		#region Definitions
 		/// <summary>顯示字體切換按鈕之 <see cref="Control.FontSize"/></summary>
@@ -34,6 +36,8 @@ namespace zongPanel.Forms {
 		private Dictionary<string, ImageSource> mResxImgSrc = new Dictionary<string, ImageSource>();
 		/// <summary>是否有按下儲存，需覆蓋原始設定資訊</summary>
 		private bool mSaved = false;
+		/// <summary>當前是否鎖定 UI</summary>
+		private bool mLock = true;
 		#endregion
 
 		#region Event Declarations
@@ -49,6 +53,29 @@ namespace zongPanel.Forms {
 		public event EventHandler<ColorEventArgs> OnColorChanging;
 		/// <summary>效能面板停靠改變事件</summary>
 		public event EventHandler<DockEventArgs> OnDockChanged;
+		/// <summary>元件解鎖改變事件</summary>
+		public event EventHandler<BoolEventArgs> OnLockChanged;
+		#endregion
+
+		#region INotifyPropertyChanged Event Handles
+		/// <summary>屬性變更事件</summary>
+		public event PropertyChangedEventHandler PropertyChanged;
+		/// <summary>發布屬性變更事件</summary>
+		/// <param name="name">屬性名稱，保持空白則以觸發者為名</param>
+		private void RaisePropChg([CallerMemberName]string name = null) {
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+		}
+		#endregion
+
+		#region Properties
+		/// <summary>取得當前是否鎖定 UI 狀況</summary>
+		public bool IsLocked {
+			get => mLock;
+			set {
+				mLock = value;
+				RaisePropChg();
+			}
+		}
 		#endregion
 
 		#region Constructors
@@ -57,6 +84,8 @@ namespace zongPanel.Forms {
 		public Option(PanelConfig config) {
 			InitializeComponent();
 
+			/* 指定資料來源 */
+			this.DataContext = this;
 			/* 讀取資源檔圖片並轉換為影像來源 */
 			InitializeImageSources();
 			/* 設定檔並還原當前的樣式 */
@@ -354,6 +383,15 @@ namespace zongPanel.Forms {
 				this.DragMove();
 		}
 
+		private void LockClicked(object sender, RoutedEventArgs e) {
+			IsLocked = !mLock;
+			OnLockChanged?.BeginInvoke(
+				this,
+				new BoolEventArgs(PanelComponent.Background, mLock),
+				null,
+				null
+			);
+		}
 		#endregion
 	}
 }

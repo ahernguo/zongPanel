@@ -140,6 +140,10 @@ namespace zongPanel {
 				mTimeFormat = new Format("HH:mm", "en-US");
 			}
 		}
+
+		private void LockChanged(object sender, BoolEventArgs e) {
+			
+		}
 		#endregion
 
 		#region Methods
@@ -348,6 +352,7 @@ namespace zongPanel {
 			opFrm.OnFormatChanged += FormatChanged;
 			opFrm.OnShortcutChanged += ShortcutChanged;
 			opFrm.OnShowSecondChanged += ShowSecondChanged;
+			opFrm.OnLockChanged += LockChanged;
 			/* 顯示介面並等待關閉 */
 			opFrm.ShowDialog();
 			/* 重新載入設定檔 */
