@@ -144,6 +144,13 @@ namespace zongPanel {
 		private void LockChanged(object sender, BoolEventArgs e) {
 			
 		}
+
+		private void OptionClosing(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+			/* 重新載入設定檔 */
+			mCore.ReloadConfig();
+			/* 還原按鈕 */
+			imgOption.TryInvoke(() => imgOption.Visibility = Visibility.Visible);
+		}
 		#endregion
 
 		#region Methods
@@ -353,10 +360,11 @@ namespace zongPanel {
 			opFrm.OnShortcutChanged += ShortcutChanged;
 			opFrm.OnShowSecondChanged += ShowSecondChanged;
 			opFrm.OnLockChanged += LockChanged;
-			/* 顯示介面並等待關閉 */
-			opFrm.ShowDialog();
-			/* 重新載入設定檔 */
-			mCore.ReloadConfig();
+			opFrm.OnWindowClosing += OptionClosing;
+			/* 顯示介面 */
+			opFrm.Show();
+			/* 隱藏 Option 按鈕 */
+			imgOption.TryInvoke(() => imgOption.Visibility = Visibility.Collapsed);
 		}
 
 		protected override void OnContentRendered(EventArgs e) {

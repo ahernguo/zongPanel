@@ -34,8 +34,6 @@ namespace zongPanel.Forms {
 		private PanelConfig mConfig;
 		/// <summary>儲存資源檔圖片與其對應的 <see cref="ImageSource"/></summary>
 		private Dictionary<string, ImageSource> mResxImgSrc = new Dictionary<string, ImageSource>();
-		/// <summary>是否有按下儲存，需覆蓋原始設定資訊</summary>
-		private bool mSaved = false;
 		/// <summary>當前是否鎖定 UI</summary>
 		private bool mLock = true;
 		#endregion
@@ -55,6 +53,8 @@ namespace zongPanel.Forms {
 		public event EventHandler<DockEventArgs> OnDockChanged;
 		/// <summary>元件解鎖改變事件</summary>
 		public event EventHandler<BoolEventArgs> OnLockChanged;
+		/// <summary>視窗關閉事件</summary>
+		public event EventHandler<PropertyChangedEventArgs> OnWindowClosing;
 		#endregion
 
 		#region INotifyPropertyChanged Event Handles
@@ -196,7 +196,6 @@ namespace zongPanel.Forms {
 		}
 
 		private void ShortcutChanged(object sender, RoutedEventArgs e) {
-			mSaved = false;
 			var chkBox = sender as CheckBox;
 			var tag = Shortcut.Calculator;
 			var chk = false;
@@ -215,7 +214,6 @@ namespace zongPanel.Forms {
 		}
 
 		private void ShowSecondChanged(object sender, RoutedEventArgs e) {
-			mSaved = false;
 			var chkBox = sender as CheckBox;
 			var chk = chkBox.TryInvoke(() => chkBox.IsChecked.Value);
 			mConfig.ChangeShowSecond(chk);
@@ -227,7 +225,6 @@ namespace zongPanel.Forms {
 		}
 
 		private void DateWeekFormatChanged(object sender, SelectionChangedEventArgs e) {
-			mSaved = false;
 			Format format = null;
 			var comboBox = sender as ComboBox;
 			var tag = PanelComponent.Week;
@@ -253,7 +250,6 @@ namespace zongPanel.Forms {
 		}
 
 		private void FontClicked(object sender, RoutedEventArgs e) {
-			mSaved = false;
 			var btn = sender as Button;
 			var tag = btn.TryInvoke(() => (PanelComponent)btn.Tag);
 
@@ -274,7 +270,6 @@ namespace zongPanel.Forms {
 		}
 
 		private void ColorChanged(object sender, MouseButtonEventArgs e) {
-			mSaved = false;
 			var rect = sender as Rectangle;
 			var tag = rect.TryInvoke(() => (PanelComponent)rect.Tag);
 
@@ -295,7 +290,6 @@ namespace zongPanel.Forms {
 		}
 
 		private void AlphaChanged(object sender, SelectionChangedEventArgs e) {
-			mSaved = false;
 			var comboBox = sender as ComboBox;
 			var tag = PanelComponent.Background;
 			var idx = 0;
@@ -313,7 +307,6 @@ namespace zongPanel.Forms {
 		}
 
 		private void UsageDockChanged(object sender, SelectionChangedEventArgs e) {
-			mSaved = false;
 			var comboBox = sender as ComboBox;
 			var idx = (UsageDock)comboBox.TryInvoke(() => comboBox.SelectedIndex);
 			mConfig.ChangeUsageDock(idx);
@@ -325,7 +318,6 @@ namespace zongPanel.Forms {
 		}
 
 		private void SaveClicked(object sender, MouseButtonEventArgs e) {
-			mSaved = true;
 			mConfig.SaveToFile();
 		}
 
@@ -334,8 +326,10 @@ namespace zongPanel.Forms {
 			if (mConfig != null) {
 				mConfig.Dispose();
 			}
-			/* 如果有按過存檔則回傳 True，設定 DialogResult 後視窗將會自動關閉 */
-			DialogResult = mSaved;
+			/* 發布事件 */
+			OnWindowClosing?.Invoke(this, new PropertyChangedEventArgs("Option"));
+			/* 關閉視窗 */
+			this.TryInvoke(() => this.Close());
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
