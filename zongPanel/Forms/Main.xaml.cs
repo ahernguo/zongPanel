@@ -20,6 +20,7 @@ using System.Windows.Shapes;
 
 using zongPanel.Library;
 using zongPanel.Forms;
+using System.Windows.Threading;
 
 namespace zongPanel {
 
@@ -42,12 +43,24 @@ namespace zongPanel {
 		private Format mTimeFormat;
 		/// <summary>指出是否已經顯示過</summary>
 		private bool mShown = false;
+		/// <summary>UI 控制項集合</summary>
+		private Dictionary<PanelComponent, Control> mCtrlDict;
+		/// <summary>開始拖曳的座標</summary>
+		private System.Windows.Point mDragPoint;
+		/// <summary>控制項原始位置</summary>
+		private Thickness mOriginMargin;
 		#endregion
 
 		#region Constructors
 		public MainWindow() {
 			/* 初始化控制項 */
 			InitializeComponent();
+			mCtrlDict = new Dictionary<PanelComponent, Control> {
+				{ PanelComponent.Background, this },
+				{ PanelComponent.Date, lbDate },
+				{ PanelComponent.Time, lbTime },
+				{ PanelComponent.Week, lbWeek }
+			};
 
 			/* 初始化核心 */
 			mCore = new PanelCore();
@@ -83,12 +96,7 @@ namespace zongPanel {
 				}
 			);
 			/* 日期、星期、時間 */
-			var labels = new Dictionary<PanelComponent, Control> {
-				{ PanelComponent.Date, lbDate },
-				{ PanelComponent.Week, lbWeek },
-				{ PanelComponent.Time, lbTime }
-			};
-			foreach (var kvp in labels) {
+			foreach (var kvp in mCtrlDict) {
 				kvp.Value.TryInvoke(
 					() => {
 						if (e.Config.GetBrush(kvp.Key, out var fg)) {
@@ -142,7 +150,52 @@ namespace zongPanel {
 		}
 
 		private void LockChanged(object sender, BoolEventArgs e) {
-			
+			if (e.Value) {
+				foreach (var kvp in mCtrlDict) {
+					if (kvp.Key != PanelComponent.Background) {
+						kvp.Value.MouseDown -= ReadyToDrag;
+						kvp.Value.MouseUp -= DragRelease;
+					}
+				}
+			} else {
+				foreach (var kvp in mCtrlDict) {
+					if (kvp.Key != PanelComponent.Background) {
+						kvp.Value.MouseDown += ReadyToDrag;
+						kvp.Value.MouseUp += DragRelease;
+					}
+				}
+			}
+		}
+
+		private void DragRelease(object sender, MouseButtonEventArgs e) {
+			if (e.LeftButton == MouseButtonState.Released) {
+				var ctrl = sender as Control;
+				ctrl.MouseMove -= Dragging;
+			}
+		}
+
+		private void Dragging(object sender, MouseEventArgs e) {
+			var ctrl = sender as Control;
+			var curPt = e.GetPosition(this);
+			ctrl.TryInvoke(
+				() => {
+					var margin = new Thickness(
+						mOriginMargin.Left + (curPt.X - mDragPoint.X),
+						mOriginMargin.Top + (curPt.Y - mDragPoint.Y),
+						0, 0
+					);
+					ctrl.Margin = margin;
+				}
+			);
+		}
+
+		private void ReadyToDrag(object sender, MouseButtonEventArgs e) {
+			if (e.LeftButton == MouseButtonState.Pressed) {
+				mDragPoint = e.GetPosition(this);
+				var ctrl = sender as Control;
+				mOriginMargin = ctrl.Margin;
+				ctrl.MouseMove += Dragging;
+			}
 		}
 
 		private void OptionClosing(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
@@ -195,35 +248,14 @@ namespace zongPanel {
 		#region UI Changes
 		private void ChangeColor(PanelComponent component, System.Drawing.Color color) {
 			switch (component) {
-				case PanelComponent.Time:
-					lbTime.TryAsyncInvoke(
-						() => {
-							var brush = color.GetBrush();
-							lbTime.Foreground = brush;
-						}
-					);
-					break;
-				case PanelComponent.Date:
-					lbDate.TryAsyncInvoke(
-						() => {
-							var brush = color.GetBrush();
-							lbDate.Foreground = brush;
-						}
-					);
-					break;
-				case PanelComponent.Week:
-					lbWeek.TryAsyncInvoke(
-						() => {
-							var brush = color.GetBrush();
-							lbWeek.Foreground = brush;
-						}
-					);
-					break;
 				case PanelComponent.Background:
-					this.TryAsyncInvoke(
+				case PanelComponent.Time:
+				case PanelComponent.Date:
+				case PanelComponent.Week:
+					mCtrlDict[component].TryInvoke(
 						() => {
 							var brush = color.GetBrush();
-							this.Background = brush;
+							mCtrlDict[component].Foreground = brush;
 						}
 					);
 					break;
@@ -237,13 +269,9 @@ namespace zongPanel {
 		private void ChangeFont(PanelComponent component, Font font) {
 			switch (component) {
 				case PanelComponent.Time:
-					lbTime.SetFont(font);
-					break;
 				case PanelComponent.Date:
-					lbDate.SetFont(font);
-					break;
 				case PanelComponent.Week:
-					lbWeek.SetFont(font);
+					mCtrlDict[component].SetFont(font);
 					break;
 				case PanelComponent.StatusBar:
 					break;
@@ -253,19 +281,17 @@ namespace zongPanel {
 		}
 
 		private void ChangePosition(PanelComponent component, PointF point) {
-			var margin = new Thickness(point.X, point.Y, 0, 0);
 			switch (component) {
-				case PanelComponent.Time:
-					lbTime.TryAsyncInvoke(() => lbTime.Margin = margin);
-					break;
-				case PanelComponent.Date:
-					lbDate.TryAsyncInvoke(() => lbDate.Margin = margin);
-					break;
-				case PanelComponent.Week:
-					lbWeek.TryAsyncInvoke(() => lbWeek.Margin = margin);
-					break;
 				case PanelComponent.Background:
-					this.TryAsyncInvoke(() => this.Margin = margin);
+				case PanelComponent.Time:
+				case PanelComponent.Date:
+				case PanelComponent.Week:
+					mCtrlDict[component].TryInvoke(
+						() => {
+							var margin = new Thickness(point.X, point.Y, 0, 0);
+							mCtrlDict[component].Margin = margin;
+						}
+					);
 					break;
 				default:
 					break;
