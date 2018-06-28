@@ -72,6 +72,8 @@
     <Compile Include="Core\Events\PanelEvents.cs" />
     <Compile Include="Core\PanelConfig.cs" />
     <Compile Include="Core\PanelCore.cs" />
+    <Compile Include="Elements\ImageChangeableButton.cs" />
+    <Compile Include="Elements\VisibilityChangeableButton.cs" />
     <Compile Include="Forms\Main.xaml.cs">
       <DependentUpon>Main.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -87,7 +89,7 @@
     </Compile>
     <Compile Include="Libraries\DailyXmlListener.cs" />
     <Compile Include="Libraries\Extensions.cs" />
-    <Compile Include="Libraries\ValueConverter.cs" />
+    <Compile Include="Elements\ValueConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -115,91 +117,91 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Z.png" />
+    <Resource Include="Resources\Z.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Z.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\add.png" />
+    <Resource Include="Resources\add.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\add_org.png" />
+    <Resource Include="Resources\add_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Calculator.png" />
+    <Resource Include="Resources\Calculator.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\close.png" />
+    <Resource Include="Resources\close.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\close_org.png" />
+    <Resource Include="Resources\close_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\CPU.png" />
+    <Resource Include="Resources\CPU.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\delete.png" />
+    <Resource Include="Resources\delete.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\delete_org.png" />
+    <Resource Include="Resources\delete_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\edit.png" />
+    <Resource Include="Resources\edit.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\edit_org.png" />
+    <Resource Include="Resources\edit_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\leave.png" />
+    <Resource Include="Resources\leave.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\leave_org.png" />
+    <Resource Include="Resources\leave_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Memory.png" />
+    <Resource Include="Resources\Memory.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\min.png" />
+    <Resource Include="Resources\min.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Note.png" />
+    <Resource Include="Resources\Note.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\option.png" />
+    <Resource Include="Resources\option.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\option_org.png" />
+    <Resource Include="Resources\option_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\print.png" />
+    <Resource Include="Resources\print.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\print_org.png" />
+    <Resource Include="Resources\print_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Radio.png" />
+    <Resource Include="Resources\Radio.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\run.png" />
+    <Resource Include="Resources\run.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\run_org.png" />
+    <Resource Include="Resources\run_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\save.png" />
+    <Resource Include="Resources\save.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\save_org.png" />
+    <Resource Include="Resources\save_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\search.png" />
+    <Resource Include="Resources\search.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\search_org.png" />
+    <Resource Include="Resources\search_org.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\size.png" />
+    <Resource Include="Resources\size.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

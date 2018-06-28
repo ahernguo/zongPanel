@@ -2,25 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using System.Resources;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 using zongPanel.Library;
-using zongPanel.Forms;
-using System.Windows.Threading;
 
 namespace zongPanel {
 
@@ -65,14 +55,6 @@ namespace zongPanel {
 			/* 初始化核心 */
 			mCore = new PanelCore();
 			mCore.ConfigChanged += ConfigChanged;
-
-			/* 讀取資源檔圖片並轉換為影像來源 */
-			InitializeImageSources();
-
-			/* 抓取每個 Image 的 Bound */
-			InitializeImageRectangle();
-			/* 添加滑鼠移動事件，移到 Image Bound 上時顯示之 */
-			this.MouseMove += MainWindow_MouseMove;
 		}
 		#endregion
 
@@ -202,48 +184,9 @@ namespace zongPanel {
 			/* 重新載入設定檔 */
 			mCore.ReloadConfig();
 			/* 還原按鈕 */
-			imgOption.TryInvoke(() => imgOption.Visibility = Visibility.Visible);
+			btnOption.TryInvoke(() => btnOption.Visibility = Visibility.Visible);
 		}
 		#endregion
-
-		#region Methods
-		/// <summary>載入資源檔圖片並轉換為 <see cref="ImageSource"/></summary>
-		private void InitializeImageSources() {
-			/* 建立 Resource 管理器，指向整個專案的 Resource */
-			var rm = new ResourceManager("zongPanel.Properties.Resources", Assembly.GetExecutingAssembly());
-
-			/* 抓取 Images */
-			var imgColl = grid.Children.Cast<UIElement>().Where(ui => ui is System.Windows.Controls.Image).Cast<System.Windows.Controls.Image>();
-			/* 利用 Image.Tag 去抓取對應的 Resource 圖片並加到 Dictionary 裡 */
-			foreach (var img in imgColl) {
-				var res = img.Tag.ToString();                           //Tag，應為 Resource 名稱
-				if (rm.GetObject(res) is System.Drawing.Bitmap pic) {   //取得其 Resource(Bitmap)
-					var imgSrc = pic.GetImageSource();      //使用 Stream 方式建立 ImageSource
-					img.Source = imgSrc;                    //設定圖片
-					img.Visibility = Visibility.Hidden;     //隱藏
-					mResxImgSrc.Add(img, imgSrc);           //加到 Dictionary 做備份
-				}
-			}
-		}
-
-		/// <summary>建立每個 <see cref="Image"/> 對應的 <see cref="Rect"/></summary>
-		private void InitializeImageRectangle() {
-			float x = 0, y = 0;
-			foreach (var kvp in mResxImgSrc) {
-				/* 縮寫 */
-				var margin = kvp.Key.Margin;
-
-				/* 取得 Top、Left 座標，暫時找不到對應的方法... */
-				x = (float)((margin.Left > margin.Right) ? margin.Left : (this.Width - margin.Right - kvp.Key.Width));
-				y = (float)((margin.Top > margin.Bottom) ? margin.Top : (this.Height - margin.Bottom - kvp.Key.Height));
-
-				/* 建立 Rect */
-				var rect = new Rect(x, y, kvp.Key.Width, kvp.Key.Height);
-
-				/* 加到集合 */
-				mImgRect.Add(kvp.Key, rect);
-			}
-		}
 
 		#region UI Changes
 		private void ChangeColor(PanelComponent component, System.Drawing.Color color) {
@@ -299,73 +242,30 @@ namespace zongPanel {
 		}
 
 		private void ChangeShortcut(Shortcut shortcut) {
-			var left = 10.0;
-			if (shortcut.HasFlag(Shortcut.Note)) {
-				imgNote.TryInvoke(
-					() => {
-						var margin = new Thickness(left, 10, 0, 0);
-						imgNote.Margin = margin;
-						left += (imgNote.Width + 5);
+			spnShortcut.TryInvoke(
+				() => {
+					/* 先移除 StackPanel 內容 */
+					spnShortcut.Children.Clear();
+					/* 依照捷徑放回去 */
+					if (shortcut.HasFlag(Shortcut.Note)) {
+						spnShortcut.Children.Add(btnNote);
 					}
-				);
-			}
-			if (shortcut.HasFlag(Shortcut.Radio)) {
-				imgRadio.TryInvoke(
-					() => {
-						var margin = new Thickness(left, 10, 0, 0);
-						imgRadio.Margin = margin;
-						left += (imgRadio.Width + 5);
+					if (shortcut.HasFlag(Shortcut.Calculator)) {
+						spnShortcut.Children.Add(btnCalc);
 					}
-				);
-			}
-			if (shortcut.HasFlag(Shortcut.Calculator)) {
-				imgCalc.TryInvoke(
-					() => {
-						var margin = new Thickness(left, 10, 0, 0);
-						imgCalc.Margin = margin;
-					}
-				);
-			}
+				}
+			);
 		}
-		#endregion
-
 		#endregion
 
 		#region UI Events
-		/// <summary>滑鼠移動事件，判斷當前滑鼠位置是否在 <see cref="Image"/> 上，是則顯示之</summary>
-		private void MainWindow_MouseMove(object sender, MouseEventArgs e) {
-			/* 取得滑鼠座標，以 Window 為準 (Gird 應該也行) */
-			var pos = e.GetPosition(this);
-			/* 查看每個 Image，檢查滑鼠座標是否在其對應的 Rect 裡，是則顯示，反之隱藏 */
-			foreach (var kvp in mImgRect) {
-				/* 縮寫 */
-				var img = kvp.Key;
-				/* 判斷是否滑鼠座標在範圍內 */
-				if (kvp.Value.Contains(pos)) {  //滑鼠座標在其 Rect 裡
-					img.TryInvoke(
-						() => {
-							if (img.Visibility != Visibility.Visible)
-								img.Visibility = Visibility.Visible;    //顯示
-						}
-					);
-				} else {                        //滑鼠座標不在其 Rect 裡
-					img.TryInvoke(
-						() => {
-							if (img.Visibility != Visibility.Hidden)
-								img.Visibility = Visibility.Hidden;     //隱藏
-						}
-					);
-				}
-			}
-		}
-
 		/// <summary>關閉應用程式</summary>
-		private void ExitClicked(object sender, MouseButtonEventArgs e) {
+		private void ExitClicked(object sender, RoutedEventArgs e) {
 			this.TryAsyncInvoke(() => this.Close());
 		}
 
 		/// <summary>開啟計算機</summary>
-		private void CalcClicked(object sender, MouseButtonEventArgs e) {
+		private void CalcClicked(object sender, RoutedEventArgs e) {
 			try {
 				/* 直接開啟，不需等待結束 */
 				Process.Start("calc");
@@ -375,7 +275,7 @@ namespace zongPanel {
 		}
 
 		/// <summary>開啟選項視窗</summary>
-		private void OptionClicked(object sender, MouseButtonEventArgs e) {
+		private void OptionClicked(object sender, RoutedEventArgs e) {
 			/* 產生介面 */
 			var opFrm = mCore.CreateOptionWindow();
 			/* 添加事件處理 */
@@ -390,7 +290,7 @@ namespace zongPanel {
 			/* 顯示介面 */
 			opFrm.Show();
 			/* 隱藏 Option 按鈕 */
-			imgOption.TryInvoke(() => imgOption.Visibility = Visibility.Collapsed);
+			btnOption.TryInvoke(() => btnOption.Visibility = Visibility.Collapsed);
 		}
 
 		protected override void OnContentRendered(EventArgs e) {
@@ -402,5 +302,8 @@ namespace zongPanel {
 			}
 		}
 		#endregion
+
+		private void imgOption_Click(object sender, RoutedEventArgs e) {
+		}
 	}
 }

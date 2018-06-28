@@ -5,8 +5,47 @@
              StartupUri="Forms\Main.xaml">
     <Application.Resources>
 		<ResourceDictionary>
+			<!-- 將 True/False 轉成 Visible/Collapsed 之轉換器 -->
 			<BooleanToVisibilityConverter x:Key="Bol2Vis"/>
+			<!-- 將 True/False 轉成 Collapsed/Visible 之轉換器 -->
 			<local:InverseBooleanToVisibilityConverter x:Key="InvBol2Vis"/>
+			<!-- 當滑鼠不在焦點上時自動隱藏的 Button -->
+			<Style x:Key="VisChgBtn" TargetType="local:VisibilityChangeableButton">
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="Button">
+							<Grid x:Name="gridTmplt" Background="Transparent">
+								<Image x:Name="imgInner" Visibility="Hidden"
+									Source="{Binding Path=Source, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"/>
+							</Grid>
+							<ControlTemplate.Triggers>
+								<Trigger SourceName="gridTmplt" Property="IsMouseOver" Value="True">
+									<Setter TargetName="imgInner" Property="Visibility" Value="Visible"/>
+								</Trigger>
+							</ControlTemplate.Triggers>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+			<!-- 當滑鼠在焦點上時變更圖案的 Button -->
+			<Style x:Key="ImgChgBtn" TargetType="local:ImageChageableButton">
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="Button">
+							<Grid x:Name="gridTmplt">
+								<Image x:Name="imgInner" Visibility="Visible"
+									Source="{Binding Path=IdleImage, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"/>
+							</Grid>
+							<ControlTemplate.Triggers>
+								<Trigger SourceName="gridTmplt" Property="IsMouseOver" Value="True">
+									<Setter TargetName="imgInner" Property="Source"
+										Value="{Binding Path=HoverImage, RelativeSource={RelativeSource FindAncestor, AncestorType=Button}}"/>
+								</Trigger>
+							</ControlTemplate.Triggers>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
 		</ResourceDictionary>
     </Application.Resources>
 </Application>

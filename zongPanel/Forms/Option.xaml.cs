@@ -86,8 +86,6 @@ namespace zongPanel.Forms {
 
 			/* 指定資料來源 */
 			this.DataContext = this;
-			/* 讀取資源檔圖片並轉換為影像來源 */
-			InitializeImageSources();
 			/* 設定檔並還原當前的樣式 */
 			mConfig = config;
 			LoadConfig(config);
@@ -95,24 +93,6 @@ namespace zongPanel.Forms {
 		#endregion
 
 		#region Methods
-		/// <summary>載入資源檔圖片並轉換為 <see cref="ImageSource"/></summary>
-		private void InitializeImageSources() {
-			/* 建立 Resource 管理器，指向整個專案的 Resource */
-			var rm = new ResourceManager("zongPanel.Properties.Resources", Assembly.GetExecutingAssembly());
-
-			var pic = rm.GetObject("save_org") as System.Drawing.Bitmap;
-			mResxImgSrc.Add("SaveOrg", pic.GetImageSource());
-			pic = rm.GetObject("save") as System.Drawing.Bitmap;
-			mResxImgSrc.Add("SaveHover", pic.GetImageSource());
-			pic = rm.GetObject("close_org") as System.Drawing.Bitmap;
-			mResxImgSrc.Add("CloseOrg", pic.GetImageSource());
-			pic = rm.GetObject("close") as System.Drawing.Bitmap;
-			mResxImgSrc.Add("CloseHover", pic.GetImageSource());
-
-			imgExit.Source = mResxImgSrc["CloseOrg"];
-			imgSave.Source = mResxImgSrc["SaveOrg"];
-		}
-
 		/// <summary>將 <see cref="System.Drawing.Color.A"/> 轉換為 10 級距的 Index，供 <see cref="ComboBox.SelectedIndex"/> 使用</summary>
 		/// <param name="color">欲判斷的顏色</param>
 		/// <returns>10 級距的 Index</returns>
@@ -317,11 +297,11 @@ namespace zongPanel.Forms {
 			);
 		}
 
-		private void SaveClicked(object sender, MouseButtonEventArgs e) {
+		private void SaveClicked(object sender, RoutedEventArgs e) {
 			mConfig.SaveToFile();
 		}
 
-		private void ExitClicked(object sender, MouseButtonEventArgs e) {
+		private void ExitClicked(object sender, RoutedEventArgs e) {
 			/* 清除記憶體 */
 			if (mConfig != null) {
 				mConfig.Dispose();
