@@ -1,19 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Reflection;
-using System.Resources;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 using zongPanel.Library;
@@ -111,7 +103,6 @@ namespace zongPanel.Forms {
 
 			chkCalc.IsChecked = config.Shortcuts.HasFlag(Shortcut.Calculator);
 			chkNote.IsChecked = config.Shortcuts.HasFlag(Shortcut.Note);
-			chkRadio.IsChecked = config.Shortcuts.HasFlag(Shortcut.Radio);
 
 			config.GetAlpha(PanelComponent.Date, out var alpha);
 			cbDateAlpha.SelectedIndex = alpha;
@@ -314,8 +305,9 @@ namespace zongPanel.Forms {
 
 		private void Window_Loaded(object sender, RoutedEventArgs e) {
 			chkNote.Checked += ShortcutChanged;
-			chkRadio.Checked += ShortcutChanged;
+			chkNote.Unchecked += ShortcutChanged;
 			chkCalc.Checked += ShortcutChanged;
+			chkCalc.Unchecked += ShortcutChanged;
 
 			cbUsgDock.SelectionChanged += UsageDockChanged;
 

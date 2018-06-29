@@ -33,8 +33,7 @@
 					<GroupBox x:Name="gbShortcut" Header="捷徑" HorizontalAlignment="Left" Margin="208,10,0,0" VerticalAlignment="Top" Height="120" Width="195" BorderBrush="#FFC8C8C8">
 						<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
 							<CheckBox x:Name="chkNote" Content="便利貼" HorizontalAlignment="Left" Margin="15,10,0,0" VerticalAlignment="Top" IsChecked="True" Tag="{x:Static local:Shortcut.Note}"/>
-							<CheckBox x:Name="chkRadio" Content="網路收音機" HorizontalAlignment="Left" Margin="15,40,0,0" VerticalAlignment="Top" IsChecked="True" Tag="{x:Static local:Shortcut.Radio}"/>
-							<CheckBox x:Name="chkCalc" Content="小算盤" HorizontalAlignment="Left" Margin="15,70,0,0" VerticalAlignment="Top" IsChecked="True" Tag="{x:Static local:Shortcut.Calculator}"/>
+							<CheckBox x:Name="chkCalc" Content="小算盤" HorizontalAlignment="Left" Margin="15,38,0,0" VerticalAlignment="Top" IsChecked="True" Tag="{x:Static local:Shortcut.Calculator}"/>
 						</Grid>
 					</GroupBox>
 					<GroupBox x:Name="gbStyle" Header="樣式" HorizontalAlignment="Left" Margin="208,135,0,0" VerticalAlignment="Top" Height="182" Width="195" BorderBrush="#FFC8C8C8">
