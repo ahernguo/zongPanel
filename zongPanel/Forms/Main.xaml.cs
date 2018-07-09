@@ -172,14 +172,6 @@ namespace zongPanel {
 			ChangeShortcut(e.Shortcut);
 		}
 
-		private void ShowSecondChanged(object sender, BoolEventArgs e) {
-			if (e.Value) {
-				mTimeFormat = new Format("HH:mm:ss", "en-US");
-			} else {
-				mTimeFormat = new Format("HH:mm", "en-US");
-			}
-		}
-
 		private void LockChanged(object sender, BoolEventArgs e) {
 			if (e.Value) {
 				foreach (var kvp in mCtrlDict) {
@@ -333,7 +325,6 @@ namespace zongPanel {
 			opFrm.OnFontChanging += FontChanging;
 			opFrm.OnFormatChanged += FormatChanged;
 			opFrm.OnShortcutChanged += ShortcutChanged;
-			opFrm.OnShowSecondChanged += ShowSecondChanged;
 			opFrm.OnLockChanged += LockChanged;
 			opFrm.OnWindowClosing += OptionClosing;
 			/* 顯示介面 */

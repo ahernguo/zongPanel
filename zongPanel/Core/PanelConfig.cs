@@ -101,7 +101,7 @@ namespace zongPanel {
 		#region Fields
 		/// <summary><see cref="DateTime.ToString"/> 格式</summary>
 		[DataMember(Name = "FormattedString")]
-		private readonly string mFmt = string.Empty;
+		private string mFmt = string.Empty;
 		/// <summary>套用於文化樣式之文化名稱，如 "en-US"、"zh-TW" 等</summary>
 		[DataMember(Name = "CultureInfo")]
 		private readonly string mCult = string.Empty;
@@ -143,6 +143,14 @@ namespace zongPanel {
 		/// <returns>描述文字</returns>
 		public override string ToString() {
 			return $"{mCult}, {mFmt}";
+		}
+		#endregion
+
+		#region Internal Operations
+		/// <summary>修改格式內容</summary>
+		/// <param name="modifier">欲修改的方法</param>
+		internal void ChangeFormat(Func<string, string> modifier) {
+			mFmt = modifier(mFmt);
 		}
 		#endregion
 
@@ -394,8 +402,23 @@ namespace zongPanel {
 
 		/// <summary>設定顯示秒數功能</summary>
 		/// <param name="show">(<see cref="true"/>)顯示秒數  (<see cref="false"/>)僅顯示時、分</param>
-		public void ChangeShowSecond(bool show) {
+		/// <returns>新的格式物件執行個體，可直接 Assign</returns>
+		public Format ChangeShowSecond(bool show) {
 			mShowSec = show;
+			if (mFormats.TryGetValue(PanelComponent.Time, out var format)) {
+				format.ChangeFormat(
+					fmt => {
+						if (show && !fmt.Contains(":ss")) {
+							return fmt.Replace("mm", "mm:ss");
+						} else if (!show && fmt.Contains(":ss")) {
+							return fmt.Replace(":ss", string.Empty);
+						} else {
+							return fmt;
+						}
+					}
+				);
+			}
+			return format.Clone();
 		}
 
 		/// <summary>設定星期顯示格式</summary>
@@ -403,10 +426,23 @@ namespace zongPanel {
 		/// <returns>新的格式物件執行個體，可直接 Assign</returns>
 		/// <remarks>目前是直接寫死，請注意參照!</remarks>
 		public Format ChangeTimeFormat(int idx) {
+			Format result = null;
 			if (TIME_FORMAT_LIST.TryGetValue(idx, out var format)) {
-				mFormats[PanelComponent.Time] = format;
+				result = format.Clone();
+				result.ChangeFormat(
+					fmt => {
+						if (mShowSec && !fmt.Contains(":ss")) {
+							return fmt.Replace("mm", "mm:ss");
+						} else if (!mShowSec && fmt.Contains(":ss")) {
+							return fmt.Replace(":ss", string.Empty);
+						} else {
+							return fmt;
+						}
+					}
+				);
+				mFormats[PanelComponent.Time] = result.Clone();
 			}
-			return format;
+			return result;
 		}
 
 		/// <summary>設定星期顯示格式</summary>
@@ -417,7 +453,7 @@ namespace zongPanel {
 			if (WEEK_FORMAT_LIST.TryGetValue(idx, out var format)) {
 				mFormats[PanelComponent.Week] = format;
 			}
-			return format;
+			return format.Clone();
 		}
 
 		/// <summary>設定日期顯示格式</summary>
@@ -428,7 +464,7 @@ namespace zongPanel {
 			if (DATE_FORMAT_LIST.TryGetValue(idx, out var format)) {
 				mFormats[PanelComponent.Date] = format;
 			}
-			return format;
+			return format.Clone();
 		}
 
 		/// <summary>設定字體樣式</summary>

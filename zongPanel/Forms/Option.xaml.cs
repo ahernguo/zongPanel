@@ -33,8 +33,6 @@ namespace zongPanel.Forms {
 		#region Event Declarations
 		/// <summary>捷徑選項改變事件</summary>
 		public event EventHandler<ShortcutEventArgs> OnShortcutChanged;
-		/// <summary>顯示秒數改變事件</summary>
-		public event EventHandler<BoolEventArgs> OnShowSecondChanged;
 		/// <summary>數值改變事件</summary>
 		public event EventHandler<FormatEventArgs> OnFormatChanged;
 		/// <summary>字型改變事件</summary>
@@ -194,10 +192,10 @@ namespace zongPanel.Forms {
 		private void ShowSecondChanged(object sender, RoutedEventArgs e) {
 			var chkBox = sender as CheckBox;
 			var chk = chkBox.TryInvoke(() => chkBox.IsChecked.Value);
-			mConfig.ChangeShowSecond(chk);
-			OnShowSecondChanged?.BeginInvoke(
+			var format = mConfig.ChangeShowSecond(chk);
+			OnFormatChanged?.BeginInvoke(
 				this,
-				new BoolEventArgs(PanelComponent.Time, chk),
+				new FormatEventArgs(PanelComponent.Time, format),
 				null, null
 			);
 		}
