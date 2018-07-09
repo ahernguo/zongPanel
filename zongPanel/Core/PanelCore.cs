@@ -18,7 +18,7 @@ namespace zongPanel {
 
 		#region Fields
 		/// <summary>上次更新日期之時間，供檢查是否需要更新日期</summary>
-		private DateTime mTime = DateTime.Now;
+		private readonly DateTime mTime = DateTime.Now;
 		/// <summary>儲存相關路徑</summary>
 		private Dictionary<Paths, string> mPath = new Dictionary<Paths, string>();
 		/// <summary>面板設定資訊</summary>

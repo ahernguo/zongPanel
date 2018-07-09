@@ -102,15 +102,21 @@
 					<GroupBox x:Name="gbFormat" Header="格式" HorizontalAlignment="Left" Margin="10,135,0,0" VerticalAlignment="Top" Height="182" Width="195" BorderBrush="#FFC8C8C8">
 						<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,0,0,0">
 							<CheckBox x:Name="chkShowSec" Content="顯示秒數" HorizontalAlignment="Left" Margin="15,15,0,0" VerticalAlignment="Top"/>
-							<Label x:Name="lbWeekFmt" Content="星期" Margin="10,47,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-							<Label x:Name="lbDateFmt" Content="日期" Margin="10,85,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
-							<ComboBox x:Name="cbWeekFmt" HorizontalAlignment="Left" Margin="55,49,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" Tag="{x:Static local:PanelComponent.Week}">
+							<Label x:Name="lbTimeFmt" Content="時間" Margin="9,45,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+							<Label x:Name="lbWeekFmt" Content="星期" Margin="9,83,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+							<Label x:Name="lbDateFmt" Content="日期" Margin="9,121,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+							<ComboBox x:Name="cbTimeFmt" HorizontalAlignment="Left" Margin="54,48,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" Tag="{x:Static local:PanelComponent.Time}">
+								<ComboBoxItem Content="23:59"/>
+								<ComboBoxItem Content="下午 11:59"/>
+								<ComboBoxItem Content="11:59 PM"/>
+							</ComboBox>
+							<ComboBox x:Name="cbWeekFmt" HorizontalAlignment="Left" Margin="54,85,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="0" Tag="{x:Static local:PanelComponent.Week}">
 								<ComboBoxItem Content="Wed"/>
 								<ComboBoxItem Content="Wednesday"/>
 								<ComboBoxItem Content="週三"/>
 								<ComboBoxItem Content="星期三"/>
 							</ComboBox>
-							<ComboBox x:Name="cbDateFmt" HorizontalAlignment="Left" Margin="55,87,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="4" Tag="{x:Static local:PanelComponent.Date}">
+							<ComboBox x:Name="cbDateFmt" HorizontalAlignment="Left" Margin="54,123,0,0" VerticalAlignment="Top" Width="120" SelectedIndex="4" Tag="{x:Static local:PanelComponent.Date}">
 								<ComboBoxItem Content="12/31"/>
 								<ComboBoxItem Content="Dec/31"/>
 								<ComboBoxItem Content="2016/12/31"/>

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Resources;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -39,6 +37,14 @@ namespace zongPanel {
 		private System.Windows.Point mDragPoint;
 		/// <summary>控制項原始位置</summary>
 		private Thickness mOriginMargin;
+		/// <summary>時間顯示之計時器</summary>
+		private Timer mTimeTmr;
+		/// <summary>指出時間顯示之計時器是否活著</summary>
+		private ManualResetEventSlim mTimeTmrAlive;
+		/// <summary>指出時間顯示是否強制刷新，於 Format 更改後調用</summary>
+		private ManualResetEventSlim mTimeRefresh;
+		/// <summary>顯示時間時的原始比較時間點</summary>
+		private DateTime mCompareTime;
 		#endregion
 
 		#region Constructors
@@ -55,6 +61,26 @@ namespace zongPanel {
 			/* 初始化核心 */
 			mCore = new PanelCore();
 			mCore.ConfigChanged += ConfigChanged;
+
+			/* 初始化計時器 */
+			mTimeTmr = new Timer(TimeChange);
+			mTimeTmrAlive = new ManualResetEventSlim();
+			mTimeRefresh = new ManualResetEventSlim();
+		}
+		#endregion
+
+		#region Time Timer Handlers
+		/// <summary>顯示時間用之計時器時間到之處發</summary>
+		/// <param name="state"></param>
+		private void TimeChange(object state) {
+			lbTime.TryAsyncInvoke(() => lbTime.Content = mTimeFormat.ToString(DateTime.Now));
+
+			if (DateTime.Now.Date != mCompareTime.Date || mTimeRefresh.IsSet) {
+				lbDate.TryInvoke(() => lbDate.Content = mDateFormat.ToString(DateTime.Now));
+				lbWeek.TryInvoke(() => lbWeek.Content = mWeekFormat.ToString(DateTime.Now));
+				mCompareTime = DateTime.Now;
+				mTimeRefresh.Reset();
+			}
 		}
 		#endregion
 
@@ -95,7 +121,21 @@ namespace zongPanel {
 			}
 			/* 捷徑 */
 			ChangeShortcut(e.Config.Shortcuts);
-		} 
+			/* 變數 */
+			e.Config.GetFormat(PanelComponent.Date, out mDateFormat);
+			e.Config.GetFormat(PanelComponent.Time, out mTimeFormat);
+			e.Config.GetFormat(PanelComponent.Week, out mWeekFormat);
+			/* 顯示當前時間 */
+			mCompareTime = DateTime.Now;
+			lbDate.TryInvoke(() => lbDate.Content = mDateFormat.ToString(mCompareTime));
+			lbWeek.TryInvoke(() => lbWeek.Content = mWeekFormat.ToString(mCompareTime));
+			lbTime.TryInvoke(() => lbTime.Content = mTimeFormat.ToString(mCompareTime));
+			/* 開啟計時器 */
+			if (!mTimeTmrAlive.IsSet) {
+				mTimeTmr.Change(0, 1000);
+				mTimeTmrAlive.Set();
+			}
+		}
 		#endregion
 
 		#region Option Window Event Handlers
@@ -112,11 +152,20 @@ namespace zongPanel {
 		}
 
 		private void FormatChanged(object sender, FormatEventArgs e) {
-			if (e.Component == PanelComponent.Date) {
-				mDateFormat = e.Value;
-			} else {
-				mWeekFormat = e.Value;
+			switch (e.Component) {
+				case PanelComponent.Time:
+					mTimeFormat = e.Value;
+					break;
+				case PanelComponent.Date:
+					mDateFormat = e.Value;
+					break;
+				case PanelComponent.Week:
+					mWeekFormat = e.Value;
+					break;
+				default:
+					break;
 			}
+			mTimeRefresh.Set();
 		}
 
 		private void ShortcutChanged(object sender, ShortcutEventArgs e) {
@@ -297,13 +346,12 @@ namespace zongPanel {
 			base.OnContentRendered(e);
 
 			if (!mShown) {
+				/* 丟出設定檔，依照設定檔進行相關位置與樣式切換 */
 				mCore.ThrowConfig();
+				/* 切換旗標 */
 				mShown = true;
 			}
 		}
 		#endregion
-
-		private void imgOption_Click(object sender, RoutedEventArgs e) {
-		}
 	}
 }

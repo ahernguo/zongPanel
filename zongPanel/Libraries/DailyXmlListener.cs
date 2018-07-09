@@ -16,9 +16,9 @@ namespace zongPanel.Library {
 		/// <summary>處理 XML 記錄檔</summary>
 		private XDocument mDoc;
 		/// <summary>紀錄上一筆資料，如跨日則需清除內容</summary>
-		private DateTime mLastDate = DateTime.Now;
+		private readonly DateTime mLastDate = DateTime.Now;
 		/// <summary>記錄檔目錄，如 @"D:\zongPanel\Logs"</summary>
-		private string mLogDir = string.Empty;
+		private readonly string mLogDir = string.Empty;
 		#endregion
 
 		#region Constructors

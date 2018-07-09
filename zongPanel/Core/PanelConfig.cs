@@ -101,10 +101,10 @@ namespace zongPanel {
 		#region Fields
 		/// <summary><see cref="DateTime.ToString"/> 格式</summary>
 		[DataMember(Name = "FormattedString")]
-		private string mFmt = string.Empty;
+		private readonly string mFmt = string.Empty;
 		/// <summary>套用於文化樣式之文化名稱，如 "en-US"、"zh-TW" 等</summary>
 		[DataMember(Name = "CultureInfo")]
-		private string mCult = string.Empty;
+		private readonly string mCult = string.Empty;
 		#endregion
 
 		#region Properties
@@ -145,6 +145,47 @@ namespace zongPanel {
 			return $"{mCult}, {mFmt}";
 		}
 		#endregion
+
+		#region Overrides
+		/// <summary>比較兩個物件是否相同</summary>
+		/// <param name="obj">欲比較的物件</param>
+		/// <returns>(True)相同 (False)不同</returns>
+		public override bool Equals(object obj) {
+			if (obj is Format format) {
+				return mFmt == format.mFmt && mCult == format.mCult;
+			} else {
+				return false;
+			}
+		}
+
+		/// <summary>取得此物件的雜湊碼</summary>
+		/// <returns>雜湊碼</returns>
+		public override int GetHashCode() {
+			return (mFmt?.GetHashCode() ?? 0x5A) ^ (mCult?.GetHashCode() ?? 0xFE) ^ 0xDB;
+		}
+
+		/// <summary>比較兩個物件是否相同</summary>
+		/// <param name="a">被比較的物件</param>
+		/// <param name="b">欲比較的物件</param>
+		/// <returns>(True)相同 (False)不同</returns>
+		public static bool operator ==(Format a, Format b) {
+			if (object.Equals(a, null)) {
+				return object.Equals(b, null);
+			} else if (a is Format fmt1 && b is Format fmt2) {
+				return fmt1.mFmt == fmt2.mFmt && fmt1.mCult == fmt2.mCult;
+			} else {
+				return false;
+			}
+		}
+
+		/// <summary>比較兩個物件是否不同</summary>
+		/// <param name="a">被比較的物件</param>
+		/// <param name="b">欲比較的物件</param>
+		/// <returns>(True)不同 (False)相同</returns>
+		public static bool operator !=(Format a, Format b) {
+			return !(a == b);
+		}
+		#endregion
 	}
 	#endregion
 
@@ -162,6 +203,27 @@ namespace zongPanel {
 	[KnownType(typeof(Shortcut))]
 	[KnownType(typeof(SizeF))]
 	public class PanelConfig : IDisposable {
+
+		#region Definitions
+		/// <summary>時間格式的預設清單</summary>
+		private static readonly Dictionary<int, Format> TIME_FORMAT_LIST = new Dictionary<int, Format> {
+			{ 0, new Format("HH:mm", "zh-TW") },    { 1, new Format("tt hh:mm", "zh-TW") },
+			{ 2, new Format("hh:mm tt", "en-US") }
+		};
+		/// <summary>日期格式的預設清單</summary>
+		private static readonly Dictionary<int, Format> WEEK_FORMAT_LIST = new Dictionary<int, Format> {
+			{ 0, new Format("ddd", "en-US") },  { 1, new Format("dddd", "en-US") },
+			{ 2, new Format("ddd", "zh-TW") },  { 3, new Format("dddd", "zh-TW") }
+		};
+		/// <summary>星期格式的預設清單</summary>
+		private static readonly Dictionary<int, Format> DATE_FORMAT_LIST = new Dictionary<int, Format> {
+			{ 0, new Format(@"MM/dd", "en-US") },       { 1, new Format(@"MMM/dd", "en-US") },
+			{ 2, new Format(@"yyyy/MM/dd", "en-US") },  { 3, new Format(@"yyyy-MM-dd", "en-US") },
+			{ 4, new Format(@"yyyy/MMM/dd", "en-US") }, { 5, new Format(@"yyyy-MMM-dd", "en-US") },
+			{ 6, new Format(@"MM/dd/yyyy", "en-US") },  { 7, new Format(@"MM/dd/yy", "en-US") },
+			{ 8, new Format(@"MM 月 dd 日", "zh-TW") },   { 9, new Format(@"yyyy 年 MM 月 dd 日", "zh-TW") }
+		};
+		#endregion
 
 		#region Fields
 		/// <summary>主面板大小與其位置</summary>
@@ -251,8 +313,9 @@ namespace zongPanel {
 			};
 
 			mFormats = new Dictionary<PanelComponent, Format> {
-				{ PanelComponent.Date, new Format(@"yyyy 年 MM 月 dd 日", "zh-TW") },
-				{ PanelComponent.Week, new Format(@"dddd", "zh-TW") }
+				{ PanelComponent.Time, TIME_FORMAT_LIST[0] },
+				{ PanelComponent.Date, DATE_FORMAT_LIST[0] },
+				{ PanelComponent.Week, WEEK_FORMAT_LIST[0] }
 			};
 
 		}
@@ -339,27 +402,22 @@ namespace zongPanel {
 		/// <param name="idx">樣式代碼</param>
 		/// <returns>新的格式物件執行個體，可直接 Assign</returns>
 		/// <remarks>目前是直接寫死，請注意參照!</remarks>
-		public Format ChangeWeekFormat(int idx) {
-			var fmt = string.Empty;
-			var cult = string.Empty;
-			switch (idx) {
-				case 0:
-					fmt = "ddd"; cult = "en-US";
-					break;
-				case 1:
-					fmt = "dddd"; cult = "en-US";
-					break;
-				case 2:
-					fmt = "ddd"; cult = "zh-TW";
-					break;
-				case 3:
-				default:
-					fmt = "dddd"; cult = "zh-TW";
-					break;
+		public Format ChangeTimeFormat(int idx) {
+			if (TIME_FORMAT_LIST.TryGetValue(idx, out var format)) {
+				mFormats[PanelComponent.Time] = format;
 			}
+			return format;
+		}
 
-			mFormats[PanelComponent.Week] = new Format(fmt, cult);
-			return new Format(fmt, cult);
+		/// <summary>設定星期顯示格式</summary>
+		/// <param name="idx">樣式代碼</param>
+		/// <returns>新的格式物件執行個體，可直接 Assign</returns>
+		/// <remarks>目前是直接寫死，請注意參照!</remarks>
+		public Format ChangeWeekFormat(int idx) {
+			if (WEEK_FORMAT_LIST.TryGetValue(idx, out var format)) {
+				mFormats[PanelComponent.Week] = format;
+			}
+			return format;
 		}
 
 		/// <summary>設定日期顯示格式</summary>
@@ -367,44 +425,10 @@ namespace zongPanel {
 		/// <returns>新的格式物件執行個體，可直接 Assign</returns>
 		/// <remarks>目前是直接寫死，請注意參照!</remarks>
 		public Format ChangeDateFormat(int idx) {
-			var fmt = string.Empty;
-			var cult = string.Empty;
-			switch (idx) {
-				case 0:
-					fmt = @"MM/dd"; cult = "en-US";
-					break;
-				case 1:
-					fmt = @"MMM/dd"; cult = "en-US";
-					break;
-				case 2:
-					fmt = @"yyyy/MM/dd"; cult = "en-US";
-					break;
-				case 3:
-					fmt = @"yyyy-MM-dd"; cult = "en-US";
-					break;
-				case 4:
-					fmt = @"yyyy/MMM/dd"; cult = "en-US";
-					break;
-				case 5:
-					fmt = @"yyyy-MMM-dd"; cult = "en-US";
-					break;
-				case 6:
-					fmt = @"MM/dd/yyyy"; cult = "en-US";
-					break;
-				case 7:
-					fmt = @"MM/dd/yy"; cult = "en-US";
-					break;
-				case 8:
-					fmt = @"MM 月 dd 日"; cult = "zh-TW";
-					break;
-				case 9:
-				default:
-					fmt = @"yyyy 年 MM 月 dd 日"; cult = "zh-TW";
-					break;
+			if (DATE_FORMAT_LIST.TryGetValue(idx, out var format)) {
+				mFormats[PanelComponent.Date] = format;
 			}
-
-			mFormats[PanelComponent.Date] = new Format(fmt, cult);
-			return new Format(fmt, cult);
+			return format;
 		}
 
 		/// <summary>設定字體樣式</summary>
@@ -434,7 +458,7 @@ namespace zongPanel {
 		public Color ChangeAlpha(PanelComponent component, int idx) {
 			var color = Color.Empty;
 			if (mColors.ContainsKey(component)) {
-				var alpha = (int)Math.Ceiling(((idx + 1) / 10F) * 255);
+				var alpha = (int) Math.Ceiling(((idx + 1) / 10F) * 255);
 				var oriClr = mColors[component];
 				color = Color.FromArgb(alpha, oriClr);
 				mColors[component] = color;
@@ -455,8 +479,8 @@ namespace zongPanel {
 		/// <param name="point">目前設定檔所儲存的座標</param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
 		public bool GetMargin(PanelComponent component, out System.Windows.Thickness margin) {
-			var exist = mPositions.ContainsKey(component);
-			var pt = exist ? mPositions[component] : PointF.Empty;
+			var exist = mPositions.TryGetValue(component, out var point);
+			var pt = exist ? point : PointF.Empty;
 			margin = new System.Windows.Thickness(pt.X, pt.Y, 0, 0);
 			return exist;
 		}
@@ -466,8 +490,8 @@ namespace zongPanel {
 		/// <param name="font">目前設定檔所儲存的字型</param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
 		public bool GetFont(PanelComponent component, out Font font) {
-			var exist = mFonts.ContainsKey(component);
-			font = exist ? mFonts[component].Copy() : null;
+			var exist = mFonts.TryGetValue(component, out var fnt);
+			font = exist ? fnt.Copy() : null;
 			return exist;
 		}
 
@@ -476,8 +500,8 @@ namespace zongPanel {
 		/// <param name="color">目前設定檔所儲存的顏色</param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
 		public bool GetColor(PanelComponent component, out Color color) {
-			var exist = mColors.ContainsKey(component);
-			color = exist ? mColors[component].Clone() : Color.Empty;
+			var exist = mColors.TryGetValue(component, out var clr);
+			color = exist ? clr.Clone() : Color.Empty;
 			return exist;
 		}
 
@@ -486,11 +510,10 @@ namespace zongPanel {
 		/// <param name="level">目前設定檔所儲存的透明程度</param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
 		public bool GetAlpha(PanelComponent component, out int level) {
-			var exist = mColors.ContainsKey(component);
+			var exist = mColors.TryGetValue(component, out var color);
 			if (exist) {
-				var color = mColors[component];
 				var alpha = (color.A / 255.0) * 100.0;
-				var quotient = (int)(alpha / 10);
+				var quotient = (int) (alpha / 10);
 				if ((alpha % 10) > 5) quotient++;
 				level = quotient - 1;
 			} else {
@@ -504,8 +527,8 @@ namespace zongPanel {
 		/// <param name="brush">目前設定檔所儲存的 <see cref="System.Windows.Media.Brush"/></param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
 		public bool GetBrush(PanelComponent component, out System.Windows.Media.Brush brush) {
-			var exist = mColors.ContainsKey(component);
-			brush = exist ? mColors[component].GetBrush() : null;
+			var exist = mColors.TryGetValue(component, out var color);
+			brush = exist ? color.GetBrush() : null;
 			return exist;
 		}
 
@@ -514,9 +537,33 @@ namespace zongPanel {
 		/// <param name="format">目前設定檔所儲存的格式</param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
 		public bool GetFormat(PanelComponent component, out Format format) {
-			var exist = mFormats.ContainsKey(component);
-			format = exist ? mFormats[component].Clone() : null;
+			var exist = mFormats.TryGetValue(component, out var fmt);
+			format = exist ? fmt.Clone() : null;
 			return exist;
+		}
+
+		/// <summary>取得元件之格式索引值</summary>
+		/// <param name="component">欲取得格式的面板元件</param>
+		/// <param name="index">目前設定檔所儲存的索引值</param>
+		/// <returns>(True)成功取得 (False)取得失敗</returns>
+		public bool GetFormat(PanelComponent component, out int index) {
+			KeyValuePair<int, Format> found = default(KeyValuePair<int, Format>);
+			switch (component) {
+				case PanelComponent.Time:
+					found = TIME_FORMAT_LIST.FirstOrDefault(kvp => kvp.Value.Equals(mFormats[PanelComponent.Time]));
+					break;
+				case PanelComponent.Date:
+					found = DATE_FORMAT_LIST.FirstOrDefault(kvp => kvp.Value.Equals(mFormats[PanelComponent.Date]));
+					break;
+				case PanelComponent.Week:
+					found = WEEK_FORMAT_LIST.FirstOrDefault(kvp => kvp.Value.Equals(mFormats[PanelComponent.Week]));
+					break;
+				default:
+					break;
+			}
+
+			index = found.Key;
+			return !(found.Value is null);
 		}
 		#endregion
 

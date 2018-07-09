@@ -121,6 +121,13 @@ namespace zongPanel.Forms {
 			config.GetAlpha(PanelComponent.Week, out alpha);
 			cbWeekAlpha.SelectedIndex = alpha;
 
+			config.GetFormat(PanelComponent.Date, out int index);
+			cbDateFmt.SelectedIndex = index;
+			config.GetFormat(PanelComponent.Time, out index);
+			cbTimeFmt.SelectedIndex = index;
+			config.GetFormat(PanelComponent.Week, out index);
+			cbWeekFmt.SelectedIndex = index;
+
 			config.GetBrush(PanelComponent.Date, out var brush);
 			rectDateColor.Fill = brush;
 			config.GetBrush(PanelComponent.Note, out brush);
@@ -207,10 +214,18 @@ namespace zongPanel.Forms {
 				}
 			);
 
-			if (tag == PanelComponent.Date) {
-				format = mConfig.ChangeDateFormat(idx);
-			} else {
-				format = mConfig.ChangeWeekFormat(idx);
+			switch (tag) {
+				case PanelComponent.Time:
+					format = mConfig.ChangeTimeFormat(idx);
+					break;
+				case PanelComponent.Date:
+					format = mConfig.ChangeDateFormat(idx);
+					break;
+				case PanelComponent.Week:
+					format = mConfig.ChangeWeekFormat(idx);
+					break;
+				default:
+					throw new InvalidEnumArgumentException("tag", (int) tag, typeof(PanelComponent));
 			}
 
 			OnFormatChanged?.BeginInvoke(
@@ -336,10 +351,12 @@ namespace zongPanel.Forms {
 			btnUsgFont.Click += FontClicked;
 			btnWeekFont.Click += FontClicked;
 
+			cbTimeFmt.SelectionChanged += DateWeekFormatChanged;
 			cbDateFmt.SelectionChanged += DateWeekFormatChanged;
 			cbWeekFmt.SelectionChanged += DateWeekFormatChanged;
 
 			chkShowSec.Checked += ShowSecondChanged;
+			chkShowSec.Unchecked += ShowSecondChanged;
 		}
 
 		private void Grid_MouseDown(object sender, MouseButtonEventArgs e) {
