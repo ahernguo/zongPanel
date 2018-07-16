@@ -507,6 +507,16 @@ namespace zongPanel {
 		public void ChangeUsageDock(UsageDock idx) {
 			mEffcDock = idx;
 		}
+
+		/// <summary>設定控制項的位置</summary>
+		/// <param name="component">欲更改的元件名稱</param>
+		/// <param name="x">控制項位置之 X 座標</param>
+		/// <param name="y">控制項位置之 Y 座標</param>
+		public void ChangeMargin(PanelComponent component, double x, double y) {
+			if (mPositions.ContainsKey(component)) {
+				mPositions[component] = new PointF((float) x, (float) y);
+			}
+		}
 		#endregion
 
 		#region Gets

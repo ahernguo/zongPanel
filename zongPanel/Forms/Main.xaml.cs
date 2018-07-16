@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
+using zongPanel.Forms;
 using zongPanel.Library;
 
 namespace zongPanel {
@@ -18,6 +19,8 @@ namespace zongPanel {
 		#region Fields
 		/// <summary>控制核心</summary>
 		private PanelCore mCore;
+		/// <summary>選項視窗</summary>
+		private Option mOptWind;
 		/// <summary>儲存資源檔圖片與其對應的 <see cref="ImageSource"/></summary>
 		private Dictionary<System.Windows.Controls.Image, ImageSource> mResxImgSrc = new Dictionary<System.Windows.Controls.Image, ImageSource>();
 		/// <summary>儲存 <see cref="Image"/> 與其對應的 <see cref="Rect"/></summary>
@@ -144,7 +147,7 @@ namespace zongPanel {
 		}
 
 		private void DockChanged(object sender, DockEventArgs e) {
-			
+
 		}
 
 		private void FontChanging(object sender, FontEventArgs e) {
@@ -192,36 +195,47 @@ namespace zongPanel {
 
 		private void DragRelease(object sender, MouseButtonEventArgs e) {
 			if (e.LeftButton == MouseButtonState.Released) {
-				var ctrl = sender as Control;
-				ctrl.MouseMove -= Dragging;
+				if (sender is Control ctrl) {
+					ctrl.MouseMove -= Dragging;
+					if (mOptWind != null) {
+						var component = (PanelComponent) ctrl.Tag;
+						mOptWind.MarginChanged(component, ctrl.Margin);
+					}
+				}
 			}
 		}
 
 		private void Dragging(object sender, MouseEventArgs e) {
-			var ctrl = sender as Control;
-			var curPt = e.GetPosition(this);
-			ctrl.TryInvoke(
-				() => {
-					var margin = new Thickness(
-						mOriginMargin.Left + (curPt.X - mDragPoint.X),
-						mOriginMargin.Top + (curPt.Y - mDragPoint.Y),
-						0, 0
-					);
-					ctrl.Margin = margin;
-				}
-			);
+			if (sender is Control ctrl) {
+				var curPt = e.GetPosition(this);
+				ctrl.TryInvoke(
+					() => {
+						var margin = new Thickness(
+							mOriginMargin.Left + (curPt.X - mDragPoint.X),
+							mOriginMargin.Top + (curPt.Y - mDragPoint.Y),
+							0, 0
+						);
+						ctrl.Margin = margin;
+					}
+				);
+			}
 		}
 
 		private void ReadyToDrag(object sender, MouseButtonEventArgs e) {
 			if (e.LeftButton == MouseButtonState.Pressed) {
 				mDragPoint = e.GetPosition(this);
-				var ctrl = sender as Control;
-				mOriginMargin = ctrl.Margin;
-				ctrl.MouseMove += Dragging;
+				if (sender is Control ctrl) {
+					mOriginMargin = ctrl.Margin;
+					ctrl.MouseMove += Dragging;
+				}
 			}
 		}
 
 		private void OptionClosing(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+			/* 若還沒鎖定控制項，鎖定之 */
+			if (!mOptWind.IsLocked) {
+				LockChanged(null, new BoolEventArgs(PanelComponent.Background, true));
+			}
 			/* 重新載入設定檔 */
 			mCore.ReloadConfig();
 			/* 還原按鈕 */
@@ -318,17 +332,17 @@ namespace zongPanel {
 		/// <summary>開啟選項視窗</summary>
 		private void OptionClicked(object sender, RoutedEventArgs e) {
 			/* 產生介面 */
-			var opFrm = mCore.CreateOptionWindow();
+			mOptWind = mCore.CreateOptionWindow();
 			/* 添加事件處理 */
-			opFrm.OnColorChanging += ColorChanging;
-			opFrm.OnDockChanged += DockChanged;
-			opFrm.OnFontChanging += FontChanging;
-			opFrm.OnFormatChanged += FormatChanged;
-			opFrm.OnShortcutChanged += ShortcutChanged;
-			opFrm.OnLockChanged += LockChanged;
-			opFrm.OnWindowClosing += OptionClosing;
+			mOptWind.OnColorChanging += ColorChanging;
+			mOptWind.OnDockChanged += DockChanged;
+			mOptWind.OnFontChanging += FontChanging;
+			mOptWind.OnFormatChanged += FormatChanged;
+			mOptWind.OnShortcutChanged += ShortcutChanged;
+			mOptWind.OnLockChanged += LockChanged;
+			mOptWind.OnWindowClosing += OptionClosing;
 			/* 顯示介面 */
-			opFrm.Show();
+			mOptWind.Show();
 			/* 隱藏 Option 按鈕 */
 			btnOption.TryInvoke(() => btnOption.Visibility = Visibility.Collapsed);
 		}

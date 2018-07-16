@@ -374,5 +374,14 @@ namespace zongPanel.Forms {
 			);
 		}
 		#endregion
+
+		#region Public Operations
+		/// <summary>更新控制項位置</summary>
+		/// <param name="component">位移的控制項</param>
+		/// <param name="thickness">新的位置</param>
+		public void MarginChanged(PanelComponent component, Thickness thickness) {
+			mConfig.ChangeMargin(component, thickness.Left, thickness.Top);
+		}
+		#endregion
 	}
 }
