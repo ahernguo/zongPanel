@@ -8,12 +8,12 @@
         Title="zongPanel" Height="245" Width="385" ResizeMode="NoResize" Background="#00000000" AllowsTransparency="True" WindowStyle="None" ShowInTaskbar="False" Focusable="False" IsTabStop="False">
 	<Grid x:Name="grid" Background="#99C8C8C8">
 		<Label x:Name="lbDate" Content="31/Dec/2020" FontFamily="Consolas" FontSize="24"
-			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="65,62,0,0"/>
+			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="65,62,0,0" Tag="{x:Static local:PanelComponent.Date}"/>
 		<Label x:Name="lbWeek" Content="Mon" FontFamily="Consolas" FontSize="24"
-			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="280,62,0,0"/>
+			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="280,62,0,0" Tag="{x:Static local:PanelComponent.Week}"/>
 		<Label x:Name="lbTime" Content="00:00:00" FontFamily="Consolas" FontSize="72"
 			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,115,0,0" Width="345" Height="90"
-			HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+			HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Tag="{x:Static local:PanelComponent.Time}"/>
 		<StackPanel x:Name="spnShortcut" Orientation="Horizontal" FlowDirection="LeftToRight"
 			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Height="30" Width="60">
 			<local:VisibilityChangeableButton x:Name="btnNote" Style="{StaticResource VisChgBtn}" Tag="Note"
