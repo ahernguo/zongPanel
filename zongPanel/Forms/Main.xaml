@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:zongPanel"
         mc:Ignorable="d"
-        Title="zongPanel" Height="245" Width="385" ResizeMode="NoResize" Background="#00000000" AllowsTransparency="True" WindowStyle="None" ShowInTaskbar="False" Focusable="False" IsTabStop="False">
-	<Grid x:Name="grid" Background="#99C8C8C8">
+        Title="zongPanel" Background="#00000000"
+		Height="245" Width="385" MinHeight="200" MinWidth="250"
+		ResizeMode="NoResize" AllowsTransparency="True" WindowStyle="None"
+		ShowInTaskbar="False" Focusable="False" IsTabStop="False"
+		SizeChanged="WindowSizeChanged">
+	<Grid x:Name="gridMain" Background="#99C8C8C8">
 		<Label x:Name="lbDate" Content="31/Dec/2020" FontFamily="Consolas" FontSize="24"
 			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="65,62,0,0" Tag="{x:Static local:PanelComponent.Date}"/>
 		<Label x:Name="lbWeek" Content="Mon" FontFamily="Consolas" FontSize="24"
@@ -21,6 +25,10 @@
 			<local:VisibilityChangeableButton x:Name="btnCalc" Style="{StaticResource VisChgBtn}" Tag="Calculator"
 				Source="/zongPanel;component/Resources/Calculator.png" Click="CalcClicked"/>
 		</StackPanel>
+		<Label Name="lbDragMove" Margin="70,10,70,0" VerticalAlignment="Top" Height="30"
+			HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+			MouseDown="WindowDragMove" MouseUp="WindowMoved"
+			Background="#007ACC" Foreground="#DCDCDC" Content="Click here to move" Visibility="Collapsed"/>
 		<StackPanel x:Name="spnSys" Orientation="Horizontal" FlowDirection="RightToLeft"
 			HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0" Height="30" Width="60">
 			<local:VisibilityChangeableButton x:Name="btnExit" Style="{StaticResource VisChgBtn}" Tag="close"

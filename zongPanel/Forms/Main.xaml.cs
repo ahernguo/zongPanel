@@ -177,6 +177,8 @@ namespace zongPanel {
 
 		private void LockChanged(object sender, BoolEventArgs e) {
 			if (e.Value) {
+				this.TryInvoke(() => this.ResizeMode = ResizeMode.NoResize);
+				lbDragMove.TryInvoke(() => lbDragMove.Visibility = Visibility.Collapsed);
 				foreach (var kvp in mCtrlDict) {
 					if (kvp.Key != PanelComponent.Background) {
 						kvp.Value.MouseDown -= ReadyToDrag;
@@ -184,6 +186,8 @@ namespace zongPanel {
 					}
 				}
 			} else {
+				this.TryInvoke(() => this.ResizeMode = ResizeMode.CanResizeWithGrip);
+				lbDragMove.TryInvoke(() => lbDragMove.Visibility = Visibility.Visible);
 				foreach (var kvp in mCtrlDict) {
 					if (kvp.Key != PanelComponent.Background) {
 						kvp.Value.MouseDown += ReadyToDrag;
@@ -347,6 +351,7 @@ namespace zongPanel {
 			btnOption.TryInvoke(() => btnOption.Visibility = Visibility.Collapsed);
 		}
 
+		/// <summary>視窗進行渲染事件，於此抓出第一次開啟視窗並要求丟出設定檔</summary>
 		protected override void OnContentRendered(EventArgs e) {
 			base.OnContentRendered(e);
 
@@ -355,6 +360,31 @@ namespace zongPanel {
 				mCore.ThrowConfig();
 				/* 切換旗標 */
 				mShown = true;
+			}
+		}
+		
+		/// <summary><see cref="lbDragMove"/> 滑鼠按下事件，讓視窗進行拖曳移動</summary>
+		/// <remarks>此事件是透過 LockChanged 事件來註冊與釋放，所以能進入此事件一定是解鎖 + 使用者要拖曳，不用加其他判斷</remarks>
+		private void WindowDragMove(object sender, MouseButtonEventArgs e) {
+			this.DragMove();
+		}
+
+		/// <summary><see cref="lbDragMove"/> 滑鼠放開事件，表示視窗拖曳完畢，儲存當前的座標</summary>
+		private void WindowMoved(object sender, MouseButtonEventArgs e) {
+			var rect = this.GetRectangle();
+			mOptWind.WindowRectangeChanged(rect);
+		}
+
+		/// <summary>視窗大小變更事件，儲存當前的大小</summary>
+		/// <remarks>
+		/// 此事件會一直存在，故判斷 IsLocked 屬性是否需要儲存當前位置與大小
+		/// 但因 ResizeWithGrip 在拖動時會一直觸發此事件，目前是還不會影響視覺動畫
+		/// 若未來過於 Lag 就加上判斷 MouseUp 事件或用 Timer 試試
+		/// </remarks>
+		private void WindowSizeChanged(object sender, SizeChangedEventArgs e) {
+			if (!(mOptWind?.IsLocked ?? true)) {
+				var rect = this.GetRectangle();
+				mOptWind.WindowRectangeChanged(rect);
 			}
 		}
 		#endregion

@@ -382,6 +382,12 @@ namespace zongPanel.Forms {
 		public void MarginChanged(PanelComponent component, Thickness thickness) {
 			mConfig.ChangeMargin(component, thickness.Left, thickness.Top);
 		}
+
+		/// <summary>更新主視窗的位置與大小</summary>
+		/// <param name="rect">新的矩形範圍</param>
+		public void WindowRectangeChanged(System.Drawing.RectangleF rect) {
+			mConfig.ChangeWindowRectange(rect);
+		}
 		#endregion
 	}
 }

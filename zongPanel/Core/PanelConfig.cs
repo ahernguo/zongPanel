@@ -517,6 +517,15 @@ namespace zongPanel {
 				mPositions[component] = new PointF((float) x, (float) y);
 			}
 		}
+
+		/// <summary>設定主視窗的位置與大小</summary>
+		/// <param name="rect">錨點與大小</param>
+		public void ChangeWindowRectange(RectangleF rect) {
+			mWindRect.X = rect.X;
+			mWindRect.Y = rect.Y;
+			mWindRect.Width = rect.Width;
+			mWindRect.Height = rect.Height;
+		}
 		#endregion
 
 		#region Gets
