@@ -10,6 +10,16 @@
 		ResizeMode="NoResize" AllowsTransparency="True" WindowStyle="None"
 		ShowInTaskbar="False" Focusable="False" IsTabStop="False"
 		SizeChanged="WindowSizeChanged">
+	<Window.Resources>
+		<ContextMenu x:Key="trayMenu">
+			<MenuItem Header="Calculator" Click="CalcClicked"/>
+			<Separator/>
+			<MenuItem Header="Add New Note" Click="AddNoteClicked"/>
+			<MenuItem Header="Hide All Notes" Click="HideNoteClicked"/>
+			<Separator/>
+			<MenuItem Header="Close" Click="ExitClicked"/>
+		</ContextMenu>
+	</Window.Resources>
 	<Grid x:Name="gridMain" Background="#99C8C8C8">
 		<Label x:Name="lbDate" Content="31/Dec/2020" FontFamily="Consolas" FontSize="24"
 			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="65,62,0,0" Tag="{x:Static local:PanelComponent.Date}"/>
@@ -21,7 +31,7 @@
 		<StackPanel x:Name="spnShortcut" Orientation="Horizontal" FlowDirection="LeftToRight"
 			HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Height="30" Width="60">
 			<local:VisibilityChangeableButton x:Name="btnNote" Style="{StaticResource VisChgBtn}" Tag="Note"
-				Source="/zongPanel;component/Resources/Note.png"/>
+				Source="/zongPanel;component/Resources/Note.png" Click="AddNoteClicked"/>
 			<local:VisibilityChangeableButton x:Name="btnCalc" Style="{StaticResource VisChgBtn}" Tag="Calculator"
 				Source="/zongPanel;component/Resources/Calculator.png" Click="CalcClicked"/>
 		</StackPanel>

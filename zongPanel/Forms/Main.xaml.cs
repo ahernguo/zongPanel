@@ -12,6 +12,8 @@ using System.Windows.Media;
 using zongPanel.Forms;
 using zongPanel.Library;
 
+using Win32Form = System.Windows.Forms;
+
 namespace zongPanel {
 
 	/// <summary>主視窗</summary>
@@ -49,9 +51,12 @@ namespace zongPanel {
 		private ManualResetEventSlim mTimeRefresh;
 		/// <summary>顯示時間時的原始比較時間點</summary>
 		private DateTime mCompareTime;
+		/// <summary>右下角工作列圖示</summary>
+		private Win32Form.NotifyIcon mNotifyIcon;
 		#endregion
 
 		#region Constructors
+
 		public MainWindow() {
 			/* 初始化控制項 */
 			InitializeComponent();
@@ -70,6 +75,20 @@ namespace zongPanel {
 			mTimeTmr = new Timer(TimeChange);
 			mTimeTmrAlive = new ManualResetEventSlim();
 			mTimeRefresh = new ManualResetEventSlim();
+
+			/* 右下角工作列圖示 */
+			mNotifyIcon = new Win32Form.NotifyIcon() {
+				Icon = Properties.Resources.Z,
+				Text = "zongPanel",
+				Visible = true
+			};
+
+			mNotifyIcon.MouseDown += (sender, e) => {
+				if (e.Button == Win32Form.MouseButtons.Right) {
+					var menu = this.FindResource("trayMenu") as ContextMenu;
+					menu.IsOpen = true;
+				}
+			};
 		}
 		#endregion
 
@@ -387,6 +406,16 @@ namespace zongPanel {
 				var rect = this.GetRectangle();
 				mOptWind.WindowRectangeChanged(rect);
 			}
+		}
+		
+		/// <summary>添加一個新便利貼</summary>
+		private void AddNoteClicked(object sender, RoutedEventArgs e) {
+
+		}
+
+		/// <summary>隱藏所有便利貼</summary>
+		private void HideNoteClicked(object sender, RoutedEventArgs e) {
+
 		}
 		#endregion
 	}
