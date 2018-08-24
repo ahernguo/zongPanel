@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
@@ -235,7 +236,7 @@ namespace zongPanel {
 			}
 		}
 
-		private void OptionClosing(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+		private void OptionClosing(object sender, PropertyChangedEventArgs e) {
 			/* 若還沒鎖定控制項，鎖定之 */
 			if (!mOptWind.IsLocked) {
 				LockChanged(null, new BoolEventArgs(PanelComponent.Background, true));

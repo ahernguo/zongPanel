@@ -8,6 +8,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
+using Win32Draw = System.Drawing;
+
 using zongPanel.Library;
 
 namespace zongPanel.Forms {
@@ -83,10 +85,10 @@ namespace zongPanel.Forms {
 		#endregion
 
 		#region Methods
-		/// <summary>將 <see cref="System.Drawing.Color.A"/> 轉換為 10 級距的 Index，供 <see cref="ComboBox.SelectedIndex"/> 使用</summary>
+		/// <summary>將 <see cref="Win32Draw.Color.A"/> 轉換為 10 級距的 Index，供 <see cref="ComboBox.SelectedIndex"/> 使用</summary>
 		/// <param name="color">欲判斷的顏色</param>
 		/// <returns>10 級距的 Index</returns>
-		private int CalculateAlphaToSelectedIndex(System.Drawing.Color color) {
+		private int CalculateAlphaToSelectedIndex(Win32Draw.Color color) {
 			var alpha = (color.A / 255) * 100;
 			var quotient = alpha / 10;
 			if ((alpha % 10) > 5) quotient++;
@@ -385,7 +387,7 @@ namespace zongPanel.Forms {
 
 		/// <summary>更新主視窗的位置與大小</summary>
 		/// <param name="rect">新的矩形範圍</param>
-		public void WindowRectangeChanged(System.Drawing.RectangleF rect) {
+		public void WindowRectangeChanged(Win32Draw.RectangleF rect) {
 			mConfig.ChangeWindowRectange(rect);
 		}
 		#endregion

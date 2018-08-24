@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Windows.Forms;
+using System.Xml;
 
 using zongPanel.Library;
+
+using Wpf = System.Windows;
 
 namespace zongPanel {
 
@@ -533,10 +533,10 @@ namespace zongPanel {
 		/// <param name="component">欲取得座標的面板元件</param>
 		/// <param name="point">目前設定檔所儲存的座標</param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
-		public bool GetMargin(PanelComponent component, out System.Windows.Thickness margin) {
+		public bool GetMargin(PanelComponent component, out Wpf.Thickness margin) {
 			var exist = mPositions.TryGetValue(component, out var point);
 			var pt = exist ? point : PointF.Empty;
-			margin = new System.Windows.Thickness(pt.X, pt.Y, 0, 0);
+			margin = new Wpf.Thickness(pt.X, pt.Y, 0, 0);
 			return exist;
 		}
 
@@ -577,11 +577,11 @@ namespace zongPanel {
 			return exist;
 		}
 
-		/// <summary>取得元件之 <see cref="System.Windows.Media.Brush"/></summary>
-		/// <param name="component">欲取得 <see cref="System.Windows.Media.Brush"/> 的面板元件</param>
-		/// <param name="brush">目前設定檔所儲存的 <see cref="System.Windows.Media.Brush"/></param>
+		/// <summary>取得元件之 <see cref="Wpf.Media.Brush"/></summary>
+		/// <param name="component">欲取得 <see cref="Wpf.Media.Brush"/> 的面板元件</param>
+		/// <param name="brush">目前設定檔所儲存的 <see cref="Wpf.Media.Brush"/></param>
 		/// <returns>(True)成功取得 (False)取得失敗</returns>
-		public bool GetBrush(PanelComponent component, out System.Windows.Media.Brush brush) {
+		public bool GetBrush(PanelComponent component, out Wpf.Media.Brush brush) {
 			var exist = mColors.TryGetValue(component, out var color);
 			brush = exist ? color.GetBrush() : null;
 			return exist;
